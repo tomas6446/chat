@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 /**
  * @author Tomas Kozakas
  */
+
 public class ClientHandler implements Runnable {
     private final Scanner scanner = new Scanner(System.in);
     private final String name;
@@ -71,5 +72,17 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        isLoggedIn = loggedIn;
     }
 }
