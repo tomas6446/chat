@@ -1,6 +1,6 @@
-package com.chat.frontend.window;
+package com.chat.client.window;
 
-import com.chat.frontend.controller.AbstractController;
+import com.chat.client.controller.AbstractController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 

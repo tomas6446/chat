@@ -1,7 +1,7 @@
-package com.chat.frontend.window.impl;
+package com.chat.client.window.impl;
 
-import com.chat.frontend.controller.AbstractController;
-import com.chat.frontend.window.AbstractWindow;
+import com.chat.client.controller.AbstractController;
+import com.chat.client.window.AbstractWindow;
 
 /**
  * @author Tomas Kozakas

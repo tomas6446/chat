@@ -1,11 +1,13 @@
-package com.chat.frontend.view.impl;
+package com.chat.client.view.impl;
 
-import com.chat.frontend.controller.impl.ConnectionController;
-import com.chat.frontend.controller.impl.MainController;
-import com.chat.frontend.view.ViewHandler;
-import com.chat.frontend.window.AbstractWindow;
-import com.chat.frontend.window.impl.ConnectionWindow;
-import com.chat.frontend.window.impl.MainWindow;
+import com.chat.client.controller.impl.ChatController;
+import com.chat.client.controller.impl.ConnectionController;
+import com.chat.client.controller.impl.MainController;
+import com.chat.client.view.ViewHandler;
+import com.chat.client.window.AbstractWindow;
+import com.chat.client.window.impl.ChatWindow;
+import com.chat.client.window.impl.ConnectionWindow;
+import com.chat.client.window.impl.MainWindow;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -22,13 +24,18 @@ public class ViewHandlerImpl implements ViewHandler {
     }
 
     @Override
-    public void launchAuthWindow() throws IOException {
+    public void launchConnectionWindow() throws IOException {
         showWindow(new ConnectionWindow(new ConnectionController(this)));
     }
 
     @Override
     public void launchMainWindow() throws IOException {
         showWindow(new MainWindow(new MainController(this)));
+    }
+
+    @Override
+    public void launchChatWindow() throws IOException {
+        showWindow(new ChatWindow(new ChatController(this)));
     }
 
     private void showWindow(AbstractWindow window) throws IOException {

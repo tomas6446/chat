@@ -1,9 +1,9 @@
-package com.chat.frontend.controller.impl;
+package com.chat.client.controller.impl;
 
-import com.chat.backend.client.Client;
-import com.chat.backend.server.Server;
-import com.chat.frontend.controller.AbstractController;
-import com.chat.frontend.view.ViewHandler;
+import com.chat.client.controller.AbstractController;
+import com.chat.client.model.User;
+import com.chat.client.view.ViewHandler;
+import com.chat.server.Client;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -25,11 +25,11 @@ public class ConnectionController extends AbstractController {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnConnect.setOnMouseClicked(event -> {
-            new Client("127.01.01", 5000);
             try {
-                viewHandler.launchMainWindow();
+                new Client(new User(tfUser.getText(), "127.01.01", 5000));
+
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                System.out.println("Unable to connect user: " + tfUser.getText());
             }
         });
     }

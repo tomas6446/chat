@@ -1,8 +1,6 @@
 package com.chat;
 
-import com.chat.frontend.view.impl.ViewHandlerImpl;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
+import com.chat.client.view.impl.ViewHandlerImpl;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -10,7 +8,7 @@ import java.io.IOException;
 public class Application extends javafx.application.Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
-        new ViewHandlerImpl(primaryStage).launchAuthWindow();
+        new ViewHandlerImpl(primaryStage).launchConnectionWindow();
     }
 
     public static void main(String[] args) {
