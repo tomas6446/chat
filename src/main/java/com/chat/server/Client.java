@@ -62,6 +62,7 @@ public class Client implements Runnable {
                     if (message.equals("/quit")) {
                         output.println(message);
                         input.close();
+                        output.close();
                         shutDown();
                     } else {
                         output.println(message);
