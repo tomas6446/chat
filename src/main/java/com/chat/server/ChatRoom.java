@@ -5,6 +5,7 @@ package com.chat.server;
  */
 public class ChatRoom {
     private String name;
+
     public ChatRoom(String name) {
         this.name = name;
     }
