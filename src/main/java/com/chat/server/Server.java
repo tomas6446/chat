@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -25,9 +24,7 @@ import java.util.concurrent.Executors;
 public class Server implements Runnable {
     private final List<Connection> connectionList = new ArrayList<>();
     private List<ChatRoom> chatRoomList = new ArrayList<>();
-    private List<User> usersList = new ArrayList<>();
-
-    private HashMap<User, String> users = new HashMap<>();
+    private List<User> userList = new ArrayList<>();
 
     private ServerSocket serverSocket;
     private ExecutorService executorService;
@@ -38,44 +35,48 @@ public class Server implements Runnable {
     }
 
     public void broadCastTo(String recipient, String message) {
-        for (Connection connection : connectionList) {
-            if (Objects.equals(connection.getUser().getUsername(), recipient)) {
-                connection.sendMessage(message);
+        if (recipient != null) {
+            for (Connection connection : connectionList) {
+                if (connection.getUser().isConnectedToPrivateMessages() && Objects.equals(connection.getUser().getUsername(), recipient)) {
+                    connection.sendMessage(message);
+                }
             }
         }
     }
 
     public void broadCastChatRoom(String chatRoom, String message) throws IOException {
-        for (ChatRoom chat : chatRoomList) {
-            if (Objects.equals(chat.getName(), chatRoom)) {
-                chat.getMessageList().add(message);
-                exportChatRoomList();
+        if (message != null && chatRoom != null) {
+            for (ChatRoom chat : chatRoomList) {
+                if (Objects.equals(chat.getName(), chatRoom)) {
+                    chat.getMessageList().add(message);
+                    exportChatRoom();
+                }
             }
-        }
-        for (Connection connection : connectionList) {
-            if (connection.getUser().isConnectedToChatRoom() && Objects.equals(connection.getUser().getChatRoomName(), chatRoom)) {
-                connection.sendMessage(message);
+            for (Connection connection : connectionList) {
+                if (connection.getUser().isConnectedToChatRoom() && Objects.equals(connection.getUser().getChatRoomName(), chatRoom)) {
+                    connection.sendMessage(message);
+                }
             }
         }
     }
 
-    public void exportConnections() throws IOException {
+    public void exportUser() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(new FileWriter("connections.json"), usersList);
+        objectMapper.writeValue(new FileWriter("data/users.json"), userList);
     }
 
-    public void importConnections() throws IOException {
-        usersList = new ObjectMapper().readValue(new File("connections.json"), new TypeReference<>() {
+    public void importUser() throws IOException {
+        userList = new ObjectMapper().readValue(new File("data/users.json"), new TypeReference<>() {
         });
     }
 
-    public void exportChatRoomList() throws IOException {
+    public void exportChatRoom() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(new FileWriter("chatroom.json"), chatRoomList);
+        objectMapper.writeValue(new FileWriter("data/chatroom.json"), chatRoomList);
     }
 
-    private void importChatRoomList() throws IOException {
-        chatRoomList = new ObjectMapper().readValue(new File("chatroom.json"), new TypeReference<>() {
+    private void importChatRoom() throws IOException {
+        chatRoomList = new ObjectMapper().readValue(new File("data/chatroom.json"), new TypeReference<>() {
         });
     }
 
@@ -98,8 +99,8 @@ public class Server implements Runnable {
             executorService = Executors.newCachedThreadPool();
             System.out.println("Server starting...\nWaiting for clients");
 
-            importConnections();
-            importChatRoomList();
+            importUser();
+            importChatRoom();
 
             while (!done) {
                 Socket socket = serverSocket.accept();

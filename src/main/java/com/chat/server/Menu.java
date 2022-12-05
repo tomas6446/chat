@@ -10,6 +10,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * @author Tomas Kozakas
+ */
 @Getter
 class Menu implements Runnable {
 
@@ -43,125 +46,151 @@ class Menu implements Runnable {
     private void quit() throws IOException {
         input.close();
         output.close();
+        server.shutDown();
     }
 
-    private void menu() {
-        try {
-            output.println("1. Private message\n2. Chat room\n0. Return\nChoice:");
-            switch (Integer.parseInt(input.readLine())) {
-                case 1 -> privateMessage();
-                case 2 -> chatRoom();
-                default -> run();
-            }
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
+    private void menu() throws IOException {
+        output.println("1. Private message\n2. Chat room\n0. Return\nChoice:");
+        switch (Integer.parseInt(input.readLine())) {
+            case 1 -> privateMessage();
+            case 2 -> chatRoom();
+            case 0 -> run();
+            default -> menu();
         }
     }
 
-    private void logIn() {
-        try {
-            output.println("Username: ");
-            String username = input.readLine();
-            output.println("Password: ");
-            String password = input.readLine();
-            server.getUsersList().forEach(user -> {
-                if (Objects.equals(username, user.getUsername()) && Objects.equals(password, user.getPassword())) {
-                    this.user = user;
-                }
-            });
-            if (this.user == null) {
-                output.println("User not resolved");
+    private void logIn() throws IOException {
+        output.println("Username: ");
+        String username = input.readLine();
+        output.println("Password: ");
+        String password = input.readLine();
+        server.getUserList().forEach(user -> {
+            if (Objects.equals(username, user.getUsername()) && Objects.equals(password, user.getPassword())) {
+                this.user = user;
+            }
+        });
+        if (this.user == null) {
+            output.println("User not resolved");
+            run();
+        }
+        output.println("Successfully connected to server");
+        server.broadCastServer(user.getUsername() + " connected!");
+    }
+
+    private void signUp() throws IOException {
+        output.println("Please enter an username: ");
+        String username = input.readLine();
+        output.println("Please enter a password: ");
+        String password = input.readLine();
+        server.getUserList().forEach(user -> {
+            if (Objects.equals(username, user.getUsername()) && Objects.equals(password, user.getPassword())) {
+                output.println("User already exists");
                 run();
             }
-            server.broadCastServer(user.getUsername() + " connected!");
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
+        });
+        user = new User(username, password);
+        server.getUserList().add(user);
+        server.broadCastServer("new user: " + user.getUsername() + " connected!");
+        server.exportUser();
     }
 
-    private void signUp() {
-        try {
-            // TODO: handle username and password creation
-            user = new User();
-            output.println("Please enter an username: ");
-            user.setUsername(input.readLine());
-            output.println("Please enter a password: ");
-            user.setPassword(input.readLine());
-            server.getUsersList().add(user);
-            server.broadCastServer("new user: " + user.getUsername() + " connected!");
-            server.exportConnections();
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
-
-    private void privateMessage() {
-        try {
-            output.println("Recipient:");
-            String recipient = input.readLine();
-
-            String message;
-            while ((message = input.readLine()) != null) {
-                if (message.startsWith("/quit")) {
-                    return;
-                } else if (message.startsWith("/return")) {
-                    run();
-                } else {
-                    server.broadCastTo(recipient, user.getUsername() + ": " + message);
+    private void privateMessage() throws IOException {
+        String recipientName = null;
+        output.println("1. Ongoing conversations\n2. Start new one\n0. Return\nChoice:");
+        switch (Integer.parseInt(input.readLine())) {
+            case 1 -> {
+                if(user.getOngoingMessages().isEmpty()) {
+                    output.println("The list is empty");
+                    privateMessage();
                 }
+
+                user.getOngoingMessages().forEach(u -> output.println(user.getOngoingMessages().indexOf(u) + 1 + ". " + u));
+                output.println("Recipient:");
+                recipientName = user.getOngoingMessages().get(Integer.parseInt(input.readLine()) - 1);
+
+                user.printPreviousMessages(output);
             }
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
+            case 2 -> {
+                output.println("Recipient username:");
+                recipientName = input.readLine();
+                user.getOngoingMessages().add(recipientName);
 
-    private void chatRoom() {
-        try {
-            output.println("1. Create chat room\n2. Connect to chat room\n0. Return\nChoice:");
-            switch (Integer.parseInt(input.readLine())) {
-                case 1 -> {
-                    output.println("Title: ");
-                    user.setChatRoomName(input.readLine());
-                    server.getChatRoomList().add(new ChatRoom(user.getChatRoomName(), new ArrayList<>()));
-                    output.println("Connected to " + server.getChatRoomList().get(server.getChatRoomList().size() - 1).getName());
-                    server.exportChatRoomList();
-                }
-                case 2 -> {
-                    server.getChatRoomList().forEach(chatRoom -> output.println(server.getChatRoomList().indexOf(chatRoom) + 1 + ". " + chatRoom.getName()));
-                    output.println("0. Return\nChoice: ");
-
-                    // Connect to specific chatroom
-                    int index = Integer.parseInt(input.readLine()) - 1;
-                    if (index > server.getChatRoomList().size() || index < 0) {
-                        menu();
+                boolean found = false;
+                for (User user : server.getUserList()) {
+                    if (Objects.equals(user.getUsername(), recipientName)) {
+                        this.user.getOngoingMessages().add(recipientName);
+                        user.getOngoingMessages().add(this.user.getUsername());
+                        server.exportUser();
+                        found = true;
+                        output.println("The recipient is " + recipientName);
                     }
-                    user.setChatRoomName(server.getChatRoomList().get(index).getName());
-                    output.println("Connected to " + user.getChatRoomName());
-                    server.getChatRoomList().get(index).printLastMessages(output);
                 }
-                default -> chatRoom();
-            }
-
-            user.setConnectedToChatRoom(true);
-            server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " joined the chat!");
-            String message;
-            while ((message = input.readLine()) != null) {
-                if (message.startsWith("/quit")) {
-                    user.setConnectedToChatRoom(false);
-                    server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
-                    quit();
-                } else if (message.startsWith("/return")) {
-                    user.setConnectedToChatRoom(false);
-                    server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
-                    menu();
-                } else {
-                    server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + ": " + message);
+                if (!found) {
+                    output.println("The recipientName doesn't exist");
+                    privateMessage();
                 }
             }
-            server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
+            case 0 -> menu();
+            default -> privateMessage();
         }
+
+        user.setConnectedToPrivateMessages(true);
+        String message;
+        while ((message = input.readLine()) != null) {
+            if (message.startsWith("/quit")) {
+                return;
+            } else if (message.startsWith("/return")) {
+                run();
+            } else {
+                server.broadCastTo(recipientName, user.getUsername() + ": " + message);
+            }
+        }
+    }
+
+    private void chatRoom() throws IOException {
+        output.println("1. Create chat room\n2. Connect to chat room\n0. Return\nChoice:");
+        switch (Integer.parseInt(input.readLine())) {
+            case 1 -> {
+                output.println("Title: ");
+                user.setChatRoomName(input.readLine());
+                server.getChatRoomList().add(new ChatRoom(user.getChatRoomName(), new ArrayList<>()));
+                output.println("Connected to " + server.getChatRoomList().get(server.getChatRoomList().size() - 1).getName());
+                server.exportChatRoom();
+            }
+            case 2 -> {
+                server.getChatRoomList().forEach(chatRoom -> output.println(server.getChatRoomList().indexOf(chatRoom) + 1 + ". " + chatRoom.getName()));
+                output.println("0. Return\nChoice: ");
+
+                // Connect to specific chatroom
+                int index = Integer.parseInt(input.readLine()) - 1;
+                if (index > server.getChatRoomList().size() || index < 0) {
+                    chatRoom();
+                }
+                user.setChatRoomName(server.getChatRoomList().get(index).getName());
+                output.println("Connected to " + user.getChatRoomName());
+                server.getChatRoomList().get(index).printPreviousMessages(output);
+            }
+            case 0 -> menu();
+            default -> chatRoom();
+        }
+
+        user.setConnectedToChatRoom(true);
+        server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " joined the chat!");
+        String message;
+        while ((message = input.readLine()) != null) {
+            if (message.startsWith("/quit")) {
+                user.setConnectedToChatRoom(false);
+                server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
+                quit();
+            } else if (message.startsWith("/return")) {
+                user.setConnectedToChatRoom(false);
+                server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
+                menu();
+            } else {
+                server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + ": " + message);
+            }
+        }
+        server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
     }
 
     public void println(String message) {

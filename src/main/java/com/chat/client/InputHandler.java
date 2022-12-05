@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+/**
+ * @author Tomas Kozakas
+ */
 class InputHandler implements Runnable {
     private final PrintWriter output;
     private final Client client;

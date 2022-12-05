@@ -24,7 +24,7 @@ public class ChatRoom {
         messageList.add(message);
     }
 
-    public void printLastMessages(PrintWriter write) {
+    public void printPreviousMessages(PrintWriter write) {
         messageList.forEach(write::println);
     }
 }
