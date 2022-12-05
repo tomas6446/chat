@@ -42,7 +42,7 @@ public class Client implements Runnable {
                 socket.close();
             }
         } catch (Exception e) {
-            System.out.println("Server not started");
+            System.out.println("server did not start");
         }
     }
 }

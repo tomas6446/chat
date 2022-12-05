@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -22,12 +23,15 @@ import java.util.concurrent.Executors;
  */
 @Getter
 public class Server implements Runnable {
-
+    private final List<Connection> connectionList = new ArrayList<>();
     private List<ChatRoom> chatRoomList = new ArrayList<>();
-    private List<Connection> connectionList = new ArrayList<>();
     private List<User> usersList = new ArrayList<>();
+
+    private HashMap<User, String> users = new HashMap<>();
+
     private ServerSocket serverSocket;
     private ExecutorService executorService;
+    private boolean done;
 
     public void broadCastServer(String message) {
         System.out.println(message);
@@ -41,60 +45,49 @@ public class Server implements Runnable {
         }
     }
 
-    public void broadCastChatRoom(String chatRoom, String message) {
+    public void broadCastChatRoom(String chatRoom, String message) throws IOException {
+        for (ChatRoom chat : chatRoomList) {
+            if (Objects.equals(chat.getName(), chatRoom)) {
+                chat.getMessageList().add(message);
+                exportChatRoomList();
+            }
+        }
         for (Connection connection : connectionList) {
-            if (connection.getUser().isConnectedToChatRoom()
-                    && Objects.equals(connection.getUser().getChatRoomName(), chatRoom)) {
+            if (connection.getUser().isConnectedToChatRoom() && Objects.equals(connection.getUser().getChatRoomName(), chatRoom)) {
                 connection.sendMessage(message);
             }
         }
     }
 
-    public void broadCastEveryone(String message) {
-        connectionList.forEach(connection -> {
-            connection.sendMessage(message);
-        });
-    }
-
     public void exportConnections() throws IOException {
-//        Set<User> users = connectionList.stream().map(Connection::getUser).collect(Collectors.toSet());
-//
-//        // Save new not existing users
-//        List<User> newUsers = users.stream().filter(Objects::nonNull).filter(i -> !usersList.contains(i)).collect(Collectors.toList());
-//        usersList.addAll(newUsers);
-
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(new FileWriter("connections.json"), usersList);
     }
 
     public void importConnections() throws IOException {
-        List<User> readValue = new ObjectMapper().readValue(new File("connections.json"), new TypeReference<>() {
+        usersList = new ObjectMapper().readValue(new File("connections.json"), new TypeReference<>() {
         });
-        this.usersList = readValue;
     }
 
-    private void exportChatRoomList() throws IOException {
+    public void exportChatRoomList() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(new FileWriter("chatroom.json"), chatRoomList);
     }
 
     private void importChatRoomList() throws IOException {
-        List<ChatRoom> readValue = new ObjectMapper().readValue(new File("chatroom.json"), new TypeReference<>() {
+        chatRoomList = new ObjectMapper().readValue(new File("chatroom.json"), new TypeReference<>() {
         });
-        this.chatRoomList = readValue;
     }
 
     public void shutDown() {
         if (serverSocket.isClosed()) {
-            return;
+            done = true;
         }
         try {
-            exportConnections();
-            exportChatRoomList();
             executorService.shutdown();
             serverSocket.close();
-        } catch (IOException ignored) {
-            System.err.println(ignored.getMessage());
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 
@@ -108,13 +101,14 @@ public class Server implements Runnable {
             importConnections();
             importChatRoomList();
 
-            while (true) {
+            while (!done) {
                 Socket socket = serverSocket.accept();
                 Connection connection = new Connection(this, socket);
                 connectionList.add(connection);
                 executorService.execute(connection);
             }
         } catch (IOException e) {
+            System.err.println(e.getMessage());
             shutDown();
         }
     }

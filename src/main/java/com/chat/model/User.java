@@ -1,5 +1,6 @@
 package com.chat.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 /**
@@ -15,6 +16,8 @@ public class User {
     private String username;
     @EqualsAndHashCode.Include
     private String password;
+    @JsonIgnore
     private boolean connectedToChatRoom;
+    @JsonIgnore
     private String chatRoomName;
 }

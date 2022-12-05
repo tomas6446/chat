@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Objects;
 
 @Getter
@@ -70,7 +71,7 @@ class Menu implements Runnable {
             });
             if (this.user == null) {
                 output.println("User not resolved");
-                logIn();
+                run();
             }
             server.broadCastServer(user.getUsername() + " connected!");
         } catch (IOException e) {
@@ -121,21 +122,22 @@ class Menu implements Runnable {
                 case 1 -> {
                     output.println("Title: ");
                     user.setChatRoomName(input.readLine());
-                    server.getChatRoomList().add(new ChatRoom(user.getChatRoomName()));
+                    server.getChatRoomList().add(new ChatRoom(user.getChatRoomName(), new ArrayList<>()));
                     output.println("Connected to " + server.getChatRoomList().get(server.getChatRoomList().size() - 1).getName());
-                    server.exportConnections();
+                    server.exportChatRoomList();
                 }
                 case 2 -> {
                     server.getChatRoomList().forEach(chatRoom -> output.println(server.getChatRoomList().indexOf(chatRoom) + 1 + ". " + chatRoom.getName()));
                     output.println("0. Return\nChoice: ");
 
                     // Connect to specific chatroom
-                    int index = Integer.parseInt(input.readLine());
-                    if (index - 1 > server.getChatRoomList().size() || index - 1 < 0) {
+                    int index = Integer.parseInt(input.readLine()) - 1;
+                    if (index > server.getChatRoomList().size() || index < 0) {
                         menu();
                     }
-                    user.setChatRoomName(server.getChatRoomList().get(index - 1).getName());
+                    user.setChatRoomName(server.getChatRoomList().get(index).getName());
                     output.println("Connected to " + user.getChatRoomName());
+                    server.getChatRoomList().get(index).printLastMessages(output);
                 }
                 default -> chatRoom();
             }
@@ -145,16 +147,18 @@ class Menu implements Runnable {
             String message;
             while ((message = input.readLine()) != null) {
                 if (message.startsWith("/quit")) {
-                    server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
-                    return;
-                } else if (message.startsWith("/return")) {
-                    server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
                     user.setConnectedToChatRoom(false);
+                    server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
+                    quit();
+                } else if (message.startsWith("/return")) {
+                    user.setConnectedToChatRoom(false);
+                    server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
                     menu();
                 } else {
                     server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + ": " + message);
                 }
             }
+            server.broadCastChatRoom(user.getChatRoomName(), user.getUsername() + " left the chat");
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

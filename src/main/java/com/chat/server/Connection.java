@@ -17,6 +17,7 @@ public class Connection implements Runnable {
     private final Server server;
     private Menu menu;
 
+
     public Connection(Server server, Socket socket) throws IOException {
         this.server = server;
         this.socket = socket;
@@ -40,4 +41,5 @@ public class Connection implements Runnable {
     public User getUser() {
         return menu.getUser();
     }
+
 }
