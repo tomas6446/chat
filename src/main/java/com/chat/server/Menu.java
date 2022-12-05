@@ -99,41 +99,26 @@ class Menu implements Runnable {
         output.println("1. Ongoing conversations\n2. Start new one\n0. Return\nChoice:");
         switch (Integer.parseInt(input.readLine())) {
             case 1 -> {
-                if(user.getOngoingMessages().isEmpty()) {
+                if (user.getOngoingConversations().isEmpty()) {
                     output.println("The list is empty");
                     privateMessage();
                 }
 
-                user.getOngoingMessages().forEach(u -> output.println(user.getOngoingMessages().indexOf(u) + 1 + ". " + u));
+                user.printOngoingConversations(output);
                 output.println("Recipient:");
-                recipientName = user.getOngoingMessages().get(Integer.parseInt(input.readLine()) - 1);
+                recipientName = input.readLine();
 
-                user.printPreviousMessages(output);
+                user.printPreviousMessages(output, recipientName);
             }
             case 2 -> {
                 output.println("Recipient username:");
                 recipientName = input.readLine();
-                user.getOngoingMessages().add(recipientName);
-
-                boolean found = false;
-                for (User user : server.getUserList()) {
-                    if (Objects.equals(user.getUsername(), recipientName)) {
-                        this.user.getOngoingMessages().add(recipientName);
-                        user.getOngoingMessages().add(this.user.getUsername());
-                        server.exportUser();
-                        found = true;
-                        output.println("The recipient is " + recipientName);
-                    }
-                }
-                if (!found) {
-                    output.println("The recipientName doesn't exist");
-                    privateMessage();
-                }
+                user.getOngoingConversations().put(recipientName, new ArrayList<>());
             }
             case 0 -> menu();
             default -> privateMessage();
         }
-
+        output.println("The recipient is " + recipientName);
         user.setConnectedToPrivateMessages(true);
         String message;
         while ((message = input.readLine()) != null) {

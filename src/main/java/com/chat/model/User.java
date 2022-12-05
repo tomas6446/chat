@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Tomas Kozakas
@@ -21,7 +22,7 @@ public class User {
     @EqualsAndHashCode.Include
     private String password;
     @EqualsAndHashCode.Include
-    private List<String> ongoingMessages = new ArrayList<>();
+    private HashMap<String, List<String>> ongoingConversations = new HashMap<>();
     @JsonIgnore
     private boolean connectedToChatRoom;
     @JsonIgnore
@@ -34,7 +35,19 @@ public class User {
         this.password = password;
     }
 
-    public void printPreviousMessages(PrintWriter write) {
-        ongoingMessages.forEach(write::println);
+    public void printOngoingConversations(PrintWriter write) {
+        Set<String> conversationName = ongoingConversations.keySet();
+        conversationName.forEach(username -> {
+            int i = 0;
+            write.println(++i + ". " + username);
+        });
+    }
+
+    public void printPreviousMessages(PrintWriter write, String recipient) {
+        write.println(ongoingConversations.get(recipient));
+    }
+
+    public void addMessage(String recipient, String message) {
+        ongoingConversations.get(recipient).add(message);
     }
 }

@@ -10,3 +10,9 @@ G.idea/sonarlint/issuestore/3/2/32e074f71d16c1e88ac02aa83592ca6ad1fd98a8,6/c/6c
 ,.idea/inspectionProfiles/Project_Default.xml,4/9/496a238a6afa168dbaf6efd37bb459331589579c
 8
 mvnw.cmd,1/f/1f1763f358c257ea3515417352b82b0165647ad1
+d
+4src/main/java/com/chat/client/ClientApplication.java,0/2/02b2200545f6c6d7041e70906dc0d1a5c9a05132
+Y
+)src/main/java/com/chat/client/Client.java,3/4/34bc78be02933e425bbe481e996b996142d84250
+d
+4src/main/java/com/chat/server/ServerApplication.java,5/0/507e31ca4eb1440f47ec75887bc756fb43831b9b

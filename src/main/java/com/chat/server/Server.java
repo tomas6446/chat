@@ -38,6 +38,7 @@ public class Server implements Runnable {
         if (recipient != null) {
             for (Connection connection : connectionList) {
                 if (connection.getUser().isConnectedToPrivateMessages() && Objects.equals(connection.getUser().getUsername(), recipient)) {
+                    connection.getUser().addMessage(recipient, message);
                     connection.sendMessage(message);
                 }
             }
