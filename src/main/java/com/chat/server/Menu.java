@@ -130,9 +130,11 @@ class Menu implements Runnable {
         String message;
         while ((message = input.readLine()) != null) {
             if (message.startsWith("/quit")) {
-                return;
+                user.setConnectedToPrivateMessages(false);
+                quit();
             } else if (message.startsWith("/return")) {
-                run();
+                user.setConnectedToPrivateMessages(false);
+                menu();
             } else {
                 server.broadCastTo(user.getUsername(), recipientName, user.getUsername() + ": " + message);
             }

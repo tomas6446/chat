@@ -36,20 +36,23 @@ public class Server implements Runnable {
 
     public void broadCastTo(String sender, String recipient, String message) throws IOException {
         if (recipient != null && message != null) {
-            Connection recipientConnection = getConnection(recipient);
-            User recipientUser = recipientConnection.getUser();
-
-            User senderUser = getConnection(sender).getUser();
-            if (recipientUser.isConnectedToPrivateMessages() && senderUser.isConnectedToPrivateMessages() && recipientUser.getUsername().equals(recipient)) {
-                recipientConnection.sendMessage(message);
+            User recipientUser = users.get(recipient);
+            User senderUser = users.get(sender);
+            if (recipientUser.getUsername().equals(recipient)) {
+                if (senderUser.isConnectedToPrivateMessages() && recipientUser.isConnectedToPrivateMessages()) {
+                    getConnection(recipient).sendMessage(message);
+                    getConnection(sender).sendMessage(message);
+                } else {
+                    getConnection(sender).sendMessage(message);
+                }
                 recipientUser.addMessage(sender, message);
-
-                getConnection(sender).sendMessage(message);
                 senderUser.addMessage(recipient, message);
                 exportData();
             }
+
         }
     }
+
 
     public void broadCastChatRoom(String chatRoom, String message) {
         if (message != null && chatRoom != null) {
