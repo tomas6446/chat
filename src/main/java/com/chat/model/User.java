@@ -23,7 +23,7 @@ public class User {
     @EqualsAndHashCode.Include
     private String password;
     @EqualsAndHashCode.Include
-    private Map<String, List<String>> ongoingConversations = new HashMap<>();
+    private Map<String, List<String>> ongoingMessages = new HashMap<>();
     @JsonIgnore
     private boolean connectedToChatRoom;
     @JsonIgnore
@@ -37,19 +37,19 @@ public class User {
     }
 
     public void printOngoingConversationNames(PrintWriter write) {
-        List<String> conversationName = ongoingConversations.keySet().stream().toList();
+        List<String> conversationName = ongoingMessages.keySet().stream().toList();
         conversationName.forEach(write::println);
     }
 
     public void printPrevPrivateMessages(PrintWriter write, String recipient) {
-        List<String> messages = ongoingConversations.get(recipient);
+        List<String> messages = ongoingMessages.get(recipient);
         messages.forEach(write::println);
     }
 
     public void addMessage(String recipient, String message) {
-        if (!ongoingConversations.containsKey(recipient)) {
-            ongoingConversations.put(recipient, new ArrayList<>());
+        if (!ongoingMessages.containsKey(recipient)) {
+            ongoingMessages.put(recipient, new ArrayList<>());
         }
-        ongoingConversations.get(recipient).add(message);
+        ongoingMessages.get(recipient).add(message);
     }
 }

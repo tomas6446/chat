@@ -60,12 +60,6 @@ public class Server implements Runnable {
                 User user = con.getUser();
                 if (user.isConnectedToChatRoom()) {
                     con.sendMessage(message);
-                    chatRooms.get(chatRoom).addMessage(message);
-                    try {
-                        exportData();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
                 }
             });
         }

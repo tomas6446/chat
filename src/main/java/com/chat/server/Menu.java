@@ -97,10 +97,10 @@ class Menu implements Runnable {
 
     private void privateMessage() throws IOException {
         String recipientName = null;
-        output.println("1. Ongoing conversations\n2. Start new one\n0. Return\nChoice:");
+        output.println("1. Ongoing messages\n2. Send new message\n0. Return\nChoice:");
         switch (Integer.parseInt(input.readLine())) {
             case 1 -> {
-                if (user.getOngoingConversations().isEmpty()) {
+                if (user.getOngoingMessages().isEmpty()) {
                     output.println("The list is empty");
                     privateMessage();
                 }
@@ -109,14 +109,18 @@ class Menu implements Runnable {
                 user.printOngoingConversationNames(output);
                 output.println("Recipient:");
                 recipientName = input.readLine();
-
-                user.printPrevPrivateMessages(output, recipientName);
+                if (user.getOngoingMessages().containsKey(recipientName)) {
+                    user.printPrevPrivateMessages(output, recipientName);
+                } else {
+                    output.println("No user with this name");
+                    privateMessage();
+                }
             }
             case 2 -> {
                 output.println("Recipient username:");
                 recipientName = input.readLine();
                 if (server.getUsers().containsKey(recipientName)) {
-                    user.getOngoingConversations().put(recipientName, new ArrayList<>());
+                    user.getOngoingMessages().put(recipientName, new ArrayList<>());
                 } else {
                     output.println("No user with this name");
                     privateMessage();
@@ -143,23 +147,18 @@ class Menu implements Runnable {
 
     private void chatRoom() throws IOException {
         String title = null;
-        output.println("1. Create chat room\n2. Connect to chat room\n0. Return\nChoice:");
+        output.println("1. Connect to chat room\n2. Create chat room\n0. Return\nChoice:");
         switch (Integer.parseInt(input.readLine())) {
             case 1 -> {
-                output.println("Chat title: ");
-                title = input.readLine();
-                user.setConnectedToChatRoom(true);
-                user.setChatRoomName(title);
-                server.getChatRooms().put(title, new ChatRoom(title, new ArrayList<>()));
-                server.exportData();
-            }
-            case 2 -> {
+                if (server.getChatRooms().isEmpty()) {
+                    output.println("The list is empty");
+                    chatRoom();
+                }
                 output.println("Available chat rooms");
                 Set<String> chatNames = server.getChatRooms().keySet();
                 for (String chatName : chatNames) {
                     output.println(chatName);
                 }
-
                 output.println("Connect to: ");
                 title = input.readLine();
 
@@ -169,6 +168,19 @@ class Menu implements Runnable {
                     server.getChatRooms().get(title).printPrevMessages(output);
                 } else {
                     output.println("No chat rooms with this name");
+                    chatRoom();
+                }
+            }
+            case 2 -> {
+                output.println("Chat title: ");
+                title = input.readLine();
+                if (!title.isEmpty() && !server.getChatRooms().containsKey(title)) {
+                    user.setConnectedToChatRoom(true);
+                    user.setChatRoomName(title);
+                    server.getChatRooms().put(title, new ChatRoom(title, new ArrayList<>()));
+                    server.exportData();
+                } else {
+                    output.println("Invalid name for chat room");
                     chatRoom();
                 }
             }
@@ -190,6 +202,8 @@ class Menu implements Runnable {
                 menu();
             } else {
                 server.broadCastChatRoom(title, user.getUsername() + ": " + message);
+                server.getChatRooms().get(title).addMessage(user.getUsername() + ": " + message);
+                server.exportData();
             }
         }
     }
