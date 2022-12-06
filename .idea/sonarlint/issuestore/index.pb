@@ -14,5 +14,3 @@ d
 4src/main/java/com/chat/client/ClientApplication.java,0/2/02b2200545f6c6d7041e70906dc0d1a5c9a05132
 Y
 )src/main/java/com/chat/client/Client.java,3/4/34bc78be02933e425bbe481e996b996142d84250
-d
-4src/main/java/com/chat/server/ServerApplication.java,5/0/507e31ca4eb1440f47ec75887bc756fb43831b9b

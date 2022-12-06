@@ -11,20 +11,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Tomas Kozakas
  */
 @Getter
 public class Server implements Runnable {
-    private final List<Connection> connectionList = new ArrayList<>();
-    private List<ChatRoom> chatRoomList = new ArrayList<>();
-    private List<User> userList = new ArrayList<>();
+    private final List<Connection> connections = new ArrayList<>();
+    private Map<String, User> users = new HashMap<>();
+    private Map<String, ChatRoom> chatRooms = new HashMap<>();
 
     private ServerSocket serverSocket;
     private ExecutorService executorService;
@@ -34,51 +34,66 @@ public class Server implements Runnable {
         System.out.println(message);
     }
 
-    public void broadCastTo(String recipient, String message) {
-        if (recipient != null) {
-            for (Connection connection : connectionList) {
-                if (connection.getUser().isConnectedToPrivateMessages() && Objects.equals(connection.getUser().getUsername(), recipient)) {
-                    connection.getUser().addMessage(recipient, message);
-                    connection.sendMessage(message);
-                }
+    public void broadCastTo(String sender, String recipient, String message) throws IOException {
+        if (recipient != null && message != null) {
+            Connection recipientConnection = getConnection(recipient);
+            User recipientUser = recipientConnection.getUser();
+
+            User senderUser = getConnection(sender).getUser();
+            if (recipientUser.isConnectedToPrivateMessages() && senderUser.isConnectedToPrivateMessages() && recipientUser.getUsername().equals(recipient)) {
+                recipientConnection.sendMessage(message);
+                recipientUser.addMessage(sender, message);
+
+                getConnection(sender).sendMessage(message);
+                senderUser.addMessage(recipient, message);
+                exportData();
             }
         }
     }
 
-    public void broadCastChatRoom(String chatRoom, String message) throws IOException {
+    public void broadCastChatRoom(String chatRoom, String message) {
         if (message != null && chatRoom != null) {
-            for (ChatRoom chat : chatRoomList) {
-                if (Objects.equals(chat.getName(), chatRoom)) {
-                    chat.getMessageList().add(message);
-                    exportChatRoom();
+            connections.forEach(con -> {
+                User user = con.getUser();
+                if (user.isConnectedToChatRoom()) {
+                    con.sendMessage(message);
+                    chatRooms.get(chatRoom).addMessage(message);
+                    try {
+                        exportData();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
-            for (Connection connection : connectionList) {
-                if (connection.getUser().isConnectedToChatRoom() && Objects.equals(connection.getUser().getChatRoomName(), chatRoom)) {
-                    connection.sendMessage(message);
-                }
-            }
+            });
         }
     }
 
-    public void exportUser() throws IOException {
+    public void exportData() throws IOException {
+        List<User> userList = users.values().stream().toList();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(new FileWriter("data/users.json"), userList);
-    }
 
-    public void importUser() throws IOException {
-        userList = new ObjectMapper().readValue(new File("data/users.json"), new TypeReference<>() {
-        });
-    }
-
-    public void exportChatRoom() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
+        List<ChatRoom> chatRoomList = chatRooms.values().stream().toList();
         objectMapper.writeValue(new FileWriter("data/chatroom.json"), chatRoomList);
     }
 
-    private void importChatRoom() throws IOException {
-        chatRoomList = new ObjectMapper().readValue(new File("data/chatroom.json"), new TypeReference<>() {
+    public void importData() throws IOException {
+        List<User> userList = new ObjectMapper().readValue(new File("data/users.json"), new TypeReference<>() {
         });
+        users = userList.stream().collect(Collectors.toMap(User::getUsername, Function.identity()));
+
+        List<ChatRoom> chatRoomList = new ObjectMapper().readValue(new File("data/chatroom.json"), new TypeReference<>() {
+        });
+        chatRooms = chatRoomList.stream().collect(Collectors.toMap(ChatRoom::getName, Function.identity()));
+    }
+
+    public Connection getConnection(String username) {
+        for (Connection con : connections) {
+            if (Objects.equals(con.getUser().getUsername(), username)) {
+                return con;
+            }
+        }
+        return null;
     }
 
     public void shutDown() {
@@ -100,13 +115,12 @@ public class Server implements Runnable {
             executorService = Executors.newCachedThreadPool();
             System.out.println("Server starting...\nWaiting for clients");
 
-            importUser();
-            importChatRoom();
+            importData();
 
             while (!done) {
                 Socket socket = serverSocket.accept();
                 Connection connection = new Connection(this, socket);
-                connectionList.add(connection);
+                connections.add(connection);
                 executorService.execute(connection);
             }
         } catch (IOException e) {

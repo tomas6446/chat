@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,15 +17,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatRoom {
-
     private String name;
-    private List<String> messageList;
+    private List<String> messages = new ArrayList<>();
 
-    public void print(String message) {
-        messageList.add(message);
+    public void printPrevMessages(PrintWriter write) {
+        messages.forEach(write::println);
     }
 
-    public void printPreviousMessages(PrintWriter write) {
-        messageList.forEach(write::println);
+    public void addMessage(String message) {
+        messages.add(message);
     }
 }

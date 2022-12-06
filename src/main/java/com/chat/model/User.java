@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * @author Tomas Kozakas
@@ -22,7 +23,7 @@ public class User {
     @EqualsAndHashCode.Include
     private String password;
     @EqualsAndHashCode.Include
-    private HashMap<String, List<String>> ongoingConversations = new HashMap<>();
+    private Map<String, List<String>> ongoingConversations = new HashMap<>();
     @JsonIgnore
     private boolean connectedToChatRoom;
     @JsonIgnore
@@ -35,19 +36,20 @@ public class User {
         this.password = password;
     }
 
-    public void printOngoingConversations(PrintWriter write) {
-        Set<String> conversationName = ongoingConversations.keySet();
-        conversationName.forEach(username -> {
-            int i = 0;
-            write.println(++i + ". " + username);
-        });
+    public void printOngoingConversationNames(PrintWriter write) {
+        List<String> conversationName = ongoingConversations.keySet().stream().toList();
+        conversationName.forEach(write::println);
     }
 
-    public void printPreviousMessages(PrintWriter write, String recipient) {
-        write.println(ongoingConversations.get(recipient));
+    public void printPrevPrivateMessages(PrintWriter write, String recipient) {
+        List<String> messages = ongoingConversations.get(recipient);
+        messages.forEach(write::println);
     }
 
     public void addMessage(String recipient, String message) {
+        if (!ongoingConversations.containsKey(recipient)) {
+            ongoingConversations.put(recipient, new ArrayList<>());
+        }
         ongoingConversations.get(recipient).add(message);
     }
 }
