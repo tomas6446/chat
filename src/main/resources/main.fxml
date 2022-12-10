@@ -4,19 +4,28 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Blend?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
 <SplitPane dividerPositions="0.29797979797979796" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="464.0" prefWidth="252.0">
         <TableView fx:id="chatTable" prefHeight="798.0" prefWidth="354.0">
             <columns>
-                <TableColumn fx:id="chatCol" prefWidth="353.0" text="Chat Rooms" />
+                <TableColumn fx:id="chatCol" prefWidth="353.0" text="Chat" />
             </columns>
         </TableView>
     </AnchorPane>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="455.0" prefWidth="397.0">
-        <TextArea fx:id="taOutput" editable="false" prefHeight="755.0" prefWidth="838.0" />
-        <TextField fx:id="tfInput" layoutY="755.0" prefHeight="45.0" prefWidth="838.0" promptText="Say something..." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="755.0" />
+      <children>
+         <TextArea fx:id="taUser" editable="false" prefHeight="798.0" prefWidth="838.0" promptText=" " text="User  ">
+            <font>
+               <Font size="42.0" />
+            </font>
+            <effect>
+               <Blend />
+            </effect>
+         </TextArea>
+      </children>
     </AnchorPane>
 </SplitPane>

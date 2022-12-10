@@ -1,5 +1,6 @@
 package com.chat.app.view;
 
+import com.chat.app.model.Chat;
 import com.chat.app.model.User;
 
 import java.io.IOException;
@@ -14,4 +15,6 @@ public interface ViewHandler {
     void launchMainWindow(User user) throws IOException;
 
     void launchRegisterWindow(Map<String, User> users) throws IOException;
+
+    void launchChatWindow(User user, Chat recipient) throws IOException;
 }

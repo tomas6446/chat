@@ -33,12 +33,11 @@ public class LoginController extends AbstractController {
     @FXML
     private Button btnRegister;
 
-
     public LoginController(ViewHandler viewHandler) {
         super(viewHandler);
     }
 
-    public EventHandler<ActionEvent> login() {
+    private EventHandler<ActionEvent> login() {
         return e -> {
             if (users.containsKey(tfUsername.getText())) {
                 User foundUser = users.get(tfUsername.getText());
@@ -54,7 +53,7 @@ public class LoginController extends AbstractController {
         };
     }
 
-    public EventHandler<ActionEvent> register() {
+    private EventHandler<ActionEvent> register() {
         return e -> {
             try {
                 viewHandler.launchRegisterWindow(users);
@@ -64,17 +63,15 @@ public class LoginController extends AbstractController {
         };
     }
 
-    public void importData() {
-        List<User> userList;
+    private void importData() {
         try {
-            userList = new ObjectMapper().readValue(new File("data/users.json"), new TypeReference<>() {
+            List<User> userList = new ObjectMapper().readValue(new File("data/users.json"), new TypeReference<>() {
             });
+            users = userList.stream().collect(Collectors.toMap(User::getName, Function.identity()));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("Unable to import user list");
         }
-        users = userList.stream().collect(Collectors.toMap(User::getName, Function.identity()));
     }
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

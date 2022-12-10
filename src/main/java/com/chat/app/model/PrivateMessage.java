@@ -3,8 +3,8 @@ package com.chat.app.model;
 /**
  * @author Tomas Kozakas
  */
-public class ChatRoom extends Chat {
-    public ChatRoom() {
+public class PrivateMessage extends Chat {
+    public PrivateMessage() {
         super();
     }
 }

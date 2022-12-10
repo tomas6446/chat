@@ -37,7 +37,7 @@ public class RegisterController extends AbstractController {
         this.users = users;
     }
 
-    public EventHandler<ActionEvent> register() {
+    private EventHandler<ActionEvent> register() {
         return e -> {
             if (!users.containsKey(tfUsername.getText())) {
                 user = new User(tfUsername.getText(), tfPassword.getText());
@@ -52,7 +52,7 @@ public class RegisterController extends AbstractController {
         };
     }
 
-    public void exportData() {
+    private void exportData() {
         List<User> userList = users.values().stream().toList();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -62,7 +62,7 @@ public class RegisterController extends AbstractController {
         }
     }
 
-    public EventHandler<ActionEvent> back() {
+    private EventHandler<ActionEvent> back() {
         return e -> {
             try {
                 viewHandler.launchLoginWindow();

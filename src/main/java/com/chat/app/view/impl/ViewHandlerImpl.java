@@ -1,11 +1,14 @@
 package com.chat.app.view.impl;
 
+import com.chat.app.controller.impl.ChatController;
 import com.chat.app.controller.impl.LoginController;
 import com.chat.app.controller.impl.MainController;
 import com.chat.app.controller.impl.RegisterController;
+import com.chat.app.model.Chat;
 import com.chat.app.model.User;
 import com.chat.app.view.ViewHandler;
 import com.chat.app.window.AbstractWindow;
+import com.chat.app.window.impl.ChatWindow;
 import com.chat.app.window.impl.LoginWindow;
 import com.chat.app.window.impl.MainWindow;
 import com.chat.app.window.impl.RegisterWindow;
@@ -38,6 +41,11 @@ public class ViewHandlerImpl implements ViewHandler {
     @Override
     public void launchRegisterWindow(Map<String, User> users) throws IOException {
         showWindow(new RegisterWindow(new RegisterController(this, users)));
+    }
+
+    @Override
+    public void launchChatWindow(User user, Chat recipient) throws IOException {
+        showWindow(new ChatWindow(new ChatController(this, user, recipient)));
     }
 
     private void showWindow(AbstractWindow window) throws IOException {

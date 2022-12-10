@@ -9,13 +9,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -29,44 +31,56 @@ import java.util.stream.Collectors;
  * @author Tomas Kozakas
  */
 public class MainController extends AbstractController {
-    private ObservableList<Chat> chatObservableList = FXCollections.observableArrayList();
+    private final User user;
     @FXML
     private TableView<Chat> chatTable;
     @FXML
     private TableColumn<Chat, String> chatCol;
 
+
+    private ObservableList<Chat> chatList = FXCollections.observableArrayList();
     private Map<String, Chat> chatRooms = new HashMap<>();
-    private final User user;
 
     public MainController(ViewHandlerImpl viewHandler, User user) {
         super(viewHandler);
         this.user = user;
     }
 
-    public void exportData() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<Chat> chatRoomList = chatRooms.values().stream().toList();
-        objectMapper.writeValue(new FileWriter("data/chatroom.json"), chatRoomList);
+    private void importData() {
+        try {
+            List<ChatRoom> roomList = new ObjectMapper().readValue(new File("data/chatroom.json"), new TypeReference<>() {
+            });
+            chatList = FXCollections.observableArrayList(roomList);
+            chatList.addAll(user.getOngoingMessages().values().stream().toList());
+            chatRooms = roomList.stream().collect(Collectors.toMap(ChatRoom::getName, Function.identity()));
+        } catch (IOException e) {
+            System.err.println("Unable to import chat room list");
+        }
     }
 
-    public void importData() {
-        List<ChatRoom> chatRoomList;
-        try {
-            chatRoomList = new ObjectMapper().readValue(new File("data/chatroom.json"), new TypeReference<>() {
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        chatRooms = chatRoomList.stream().collect(Collectors.toMap(ChatRoom::getName, Function.identity()));
-        chatObservableList = FXCollections.observableArrayList(chatRooms.values().stream().toList());
+    private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
+        return e -> {
+            if (!row.isEmpty()) {
+                try {
+                    Chat recipient = row.getItem();
+                    viewHandler.launchChatWindow(user, recipient);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        };
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        importData();
         chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        System.out.println("Connected user:" + user);
+        importData();
 
-        chatTable.setItems(chatObservableList);
+        chatTable.setRowFactory(chat -> {
+            TableRow<Chat> row = new TableRow<>();
+            row.setOnMouseClicked(chat(row));
+            return row;
+        });
+        chatTable.setItems(chatList);
     }
 }
