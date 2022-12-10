@@ -1,0 +1,37 @@
+package com.chat.app.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author Tomas Kozakas
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+public class User extends Chat {
+    @EqualsAndHashCode.Include
+    private String name;
+    @EqualsAndHashCode.Include
+    private String password;
+    @EqualsAndHashCode.Include
+    private Map<String, List<String>> ongoingMessages = new HashMap<>();
+    @JsonIgnore
+    private boolean connectedToChatRoom;
+    @JsonIgnore
+    private boolean connectedToPrivateMessages;
+    @JsonIgnore
+    private String chatRoomName;
+
+    public User(String name, String password) {
+        this.name = name;
+        this.password = password;
+    }
+
+}
