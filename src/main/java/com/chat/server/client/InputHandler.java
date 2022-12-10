@@ -9,9 +9,9 @@ import java.util.List;
  * @author Tomas Kozakas
  */
 class InputHandler implements Runnable {
-    private List<ClientHandler> clients;
     private final PrintWriter output;
     private final BufferedReader input;
+    private List<ClientHandler> clients;
 
     public InputHandler(List<ClientHandler> clients, PrintWriter output, BufferedReader input) {
         this.output = output;

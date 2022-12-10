@@ -16,6 +16,10 @@ import java.util.List;
 public class Server implements Runnable {
     private final List<ClientHandler> clients = new ArrayList<>();
 
+    public static void main(String[] args) {
+        new Server().run();
+    }
+
     @Override
     public void run() {
         try {
@@ -32,9 +36,5 @@ public class Server implements Runnable {
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
-    }
-
-    public static void main(String[] args) {
-        new Server().run();
     }
 }

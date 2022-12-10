@@ -14,7 +14,10 @@ import javafx.scene.control.TextField;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -22,8 +25,8 @@ import java.util.stream.Collectors;
  * @author Tomas Kozakas
  */
 public class LoginController extends AbstractController {
-    private Map<String, User> users = new HashMap<>();
-    private User user;
+    private User user = new User();
+    private Map<String, User> userMap;
     @FXML
     private TextField tfUsername;
     @FXML
@@ -39,14 +42,14 @@ public class LoginController extends AbstractController {
 
     private EventHandler<ActionEvent> login() {
         return e -> {
-            if (users.containsKey(tfUsername.getText())) {
-                User foundUser = users.get(tfUsername.getText());
+            if (userMap.containsKey(tfUsername.getText())) {
+                User foundUser = userMap.get(tfUsername.getText());
                 if (Objects.equals(foundUser.getPassword(), tfPassword.getText())) {
                     this.user = foundUser;
                     try {
-                        viewHandler.launchMainWindow(user);
+                        viewHandler.launchMainWindow(user, userMap);
                     } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        System.err.println(ex.getMessage());
                     }
                 }
             }
@@ -56,9 +59,9 @@ public class LoginController extends AbstractController {
     private EventHandler<ActionEvent> register() {
         return e -> {
             try {
-                viewHandler.launchRegisterWindow(users);
+                viewHandler.launchRegisterWindow(userMap);
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                System.err.println(ex.getMessage());
             }
         };
     }
@@ -67,7 +70,7 @@ public class LoginController extends AbstractController {
         try {
             List<User> userList = new ObjectMapper().readValue(new File("data/users.json"), new TypeReference<>() {
             });
-            users = userList.stream().collect(Collectors.toMap(User::getName, Function.identity()));
+            userMap = userList.stream().collect(Collectors.toMap(User::getName, Function.identity()));
         } catch (IOException e) {
             System.err.println("Unable to import user list");
         }

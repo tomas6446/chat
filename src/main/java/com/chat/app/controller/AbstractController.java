@@ -11,6 +11,5 @@ public abstract class AbstractController implements Initializable {
 
     protected AbstractController(ViewHandler viewHandler) {
         this.viewHandler = viewHandler;
-
     }
 }

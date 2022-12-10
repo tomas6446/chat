@@ -14,4 +14,8 @@ import java.util.List;
 public abstract class Chat {
     protected List<String> messages = new ArrayList<>();
     protected String name;
+
+    public Chat(String name) {
+        this.name = name;
+    }
 }

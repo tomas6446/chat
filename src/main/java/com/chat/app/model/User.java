@@ -3,7 +3,9 @@ package com.chat.app.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,6 +23,8 @@ public class User {
     private String password;
     @EqualsAndHashCode.Include
     private Map<String, PrivateMessage> ongoingMessages = new HashMap<>();
+    @EqualsAndHashCode.Include
+    private List<String> chatRoomNames = new ArrayList<>();
     @JsonIgnore
     private boolean connectedToChatRoom;
     @JsonIgnore

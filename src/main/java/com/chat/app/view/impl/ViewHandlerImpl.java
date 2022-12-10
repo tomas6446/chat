@@ -12,6 +12,7 @@ import com.chat.app.window.impl.ChatWindow;
 import com.chat.app.window.impl.LoginWindow;
 import com.chat.app.window.impl.MainWindow;
 import com.chat.app.window.impl.RegisterWindow;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -34,18 +35,18 @@ public class ViewHandlerImpl implements ViewHandler {
     }
 
     @Override
-    public void launchMainWindow(User user) throws IOException {
-        showWindow(new MainWindow(new MainController(this, user)));
+    public void launchMainWindow(User user, Map<String, User> userMap) throws IOException {
+        showWindow(new MainWindow(new MainController(this, user, userMap)));
     }
 
     @Override
-    public void launchRegisterWindow(Map<String, User> users) throws IOException {
-        showWindow(new RegisterWindow(new RegisterController(this, users)));
+    public void launchRegisterWindow(Map<String, User> userMap) throws IOException {
+        showWindow(new RegisterWindow(new RegisterController(this, userMap)));
     }
 
     @Override
-    public void launchChatWindow(User user, Chat recipient) throws IOException {
-        showWindow(new ChatWindow(new ChatController(this, user, recipient)));
+    public void launchChatWindow(Chat recipient, User user, ObservableList<Chat> chatTableList) throws IOException {
+        showWindow(new ChatWindow(new ChatController(this, recipient, user, chatTableList)));
     }
 
     private void showWindow(AbstractWindow window) throws IOException {

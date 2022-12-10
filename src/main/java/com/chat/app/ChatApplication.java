@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * @author Tomas Kozakas
  */
-public class Chat extends javafx.application.Application {
+public class ChatApplication extends javafx.application.Application {
 
     public static void main(String[] args) {
         launch();

@@ -19,7 +19,7 @@
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="455.0" prefWidth="397.0">
         <TextArea fx:id="taOutput" editable="false" layoutY="28.0" prefHeight="733.0" prefWidth="838.0" />
       <TextField fx:id="tfInput" layoutY="760.0" prefHeight="37.0" prefWidth="838.0" />
-      <TextField fx:id="tfRecipient" alignment="CENTER" layoutY="1.0" prefHeight="26.0" prefWidth="838.0" />
+      <TextField fx:id="tfRecipient" alignment="CENTER" editable="false" layoutY="1.0" prefHeight="26.0" prefWidth="838.0" />
       <Button fx:id="btnBack" layoutX="791.0" layoutY="1.0" mnemonicParsing="false" text="Back" />
     </AnchorPane>
 </SplitPane>

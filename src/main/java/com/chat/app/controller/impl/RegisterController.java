@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -21,8 +22,8 @@ import java.util.ResourceBundle;
  * @author Tomas Kozakas
  */
 public class RegisterController extends AbstractController {
-    private final Map<String, User> users;
     private User user;
+    private Map<String, User> userMap = new HashMap<>();
     @FXML
     private TextField tfUsername;
     @FXML
@@ -32,33 +33,33 @@ public class RegisterController extends AbstractController {
     @FXML
     private Button btnRegister;
 
-    public RegisterController(ViewHandler viewHandler, Map<String, User> users) {
+    public RegisterController(ViewHandler viewHandler, Map<String, User> userMap) {
         super(viewHandler);
-        this.users = users;
+        this.userMap = userMap;
     }
 
     private EventHandler<ActionEvent> register() {
         return e -> {
-            if (!users.containsKey(tfUsername.getText())) {
+            if (!userMap.containsKey(tfUsername.getText())) {
                 user = new User(tfUsername.getText(), tfPassword.getText());
-                users.put(tfUsername.getText(), user);
+                userMap.put(tfUsername.getText(), user);
                 exportData();
                 try {
-                    viewHandler.launchMainWindow(user);
+                    viewHandler.launchMainWindow(user, userMap);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    System.err.println(ex.getMessage());
                 }
             }
         };
     }
 
     private void exportData() {
-        List<User> userList = users.values().stream().toList();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
+            List<User> userList = userMap.values().stream().toList();
             objectMapper.writeValue(new FileWriter("data/users.json"), userList);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println(e.getMessage());
         }
     }
 
@@ -67,7 +68,7 @@ public class RegisterController extends AbstractController {
             try {
                 viewHandler.launchLoginWindow();
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                System.err.println(ex.getMessage());
             }
         };
     }
