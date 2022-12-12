@@ -72,6 +72,9 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> findUser() {
         return e -> {
+            if (database.containsUser(tfRoomName.getText())) {
+
+            }
         };
     }
 
@@ -79,7 +82,7 @@ public class MainController extends AbstractController {
         return e -> {
             if (database.containsChat(tfRoomName.getText())) {
                 Chat chat = database.getChat(tfRoomName.getText());
-                if(!user.getChatList().contains(chat)) {
+                if (!user.getChatList().contains(chat)) {
                     user.addChat(chat);
                     database.updateUser(user);
                     database.exportData();

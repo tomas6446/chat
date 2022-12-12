@@ -1,6 +1,7 @@
 package com.chat.app.controller.impl;
 
 import com.chat.app.controller.AbstractController;
+import com.chat.app.listener.Listener;
 import com.chat.app.model.Database;
 import com.chat.app.model.User;
 import com.chat.app.view.ViewHandler;
@@ -12,6 +13,7 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -35,12 +37,21 @@ public class LoginController extends AbstractController {
 
     private EventHandler<ActionEvent> login() {
         return e -> {
-            if (database.containsUser(tfUsername.getText(), tfPassword.getText())) {
-                this.user = database.getUser(tfUsername.getText());
-                try {
-                    viewHandler.launchMainWindow(user, database);
-                } catch (IOException ex) {
-                    System.err.println("Error launching main window");
+            if (database.containsUser(tfUsername.getText())) {
+                User foundUser = database.getUser(tfUsername.getText());
+                if (Objects.equals(foundUser.getPassword(), tfPassword.getText())) {
+                    try {
+                        this.user = foundUser;
+                        Listener listener = new Listener(user, database, viewHandler);
+                        Thread thread = new Thread(listener);
+                        viewHandler.launchMainWindow(user, database);
+                        thread.start();
+                    } catch (IOException ex) {
+                        System.out.println("Error login in");
+                        ex.printStackTrace();
+                    }
+                } else {
+                    System.err.println("User not resolved");
                 }
             }
         };
@@ -48,7 +59,7 @@ public class LoginController extends AbstractController {
 
     private EventHandler<ActionEvent> register() {
         return e -> {
-            if (!database.containsUser(tfUsername.getText(), tfPassword.getText())) {
+            if (!database.containsUser(tfUsername.getText())) {
                 user = new User(tfUsername.getText(), tfPassword.getText());
                 database.addUser(user);
                 database.exportData();
@@ -56,6 +67,7 @@ public class LoginController extends AbstractController {
                     viewHandler.launchMainWindow(user, database);
                 } catch (IOException ex) {
                     System.err.println("Error launching main window");
+                    ex.printStackTrace();
                 }
             }
         };

@@ -52,8 +52,8 @@ public class Database {
         }
     }
 
-    public boolean containsUser(String username, String password) {
-        return userMap.containsKey(username) && userMap.get(username).getPassword().equals(password);
+    public boolean containsUser(String username) {
+        return userMap.containsKey(username);
     }
 
     public boolean containsChat(String chatName) {

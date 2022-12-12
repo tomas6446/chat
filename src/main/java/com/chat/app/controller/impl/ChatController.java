@@ -69,8 +69,9 @@ public class ChatController extends AbstractController {
     private EventHandler<KeyEvent> sendMessage() {
         return e -> {
             if (e.getCode() == KeyCode.ENTER) {
-                chat.getMessages().add(user.getName() + ": " + tfInput.getText() + "\n");
-                taOutput.appendText(user.getName() + ": " + tfInput.getText() + "\n");
+                String message = user.getName() + ": " + tfInput.getText() + "\n";
+                chat.getMessages().add(message);
+                taOutput.appendText(message);
                 database.updateChat(chat);
                 database.exportData();
                 tfInput.clear();
