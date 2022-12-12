@@ -23,12 +23,20 @@ module com {
             com.fasterxml.jackson.databind,
             javafx.fxml;
 
-    exports com.chat.server;
-    opens com.chat.server.client to
+    exports com.chat.server.server;
+    opens com.chat.server.server to
             lombok,
             com.fasterxml.jackson.annotation,
             com.fasterxml.jackson.databind;
-    opens com.chat.server to
+
+    exports com.chat.server.model;
+    opens com.chat.server.model to
+            lombok,
+            com.fasterxml.jackson.annotation,
+            com.fasterxml.jackson.databind;
+
+    exports com.chat.server.client;
+    opens com.chat.server.client to
             lombok,
             com.fasterxml.jackson.annotation,
             com.fasterxml.jackson.databind;

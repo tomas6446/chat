@@ -1,12 +1,11 @@
 package com.chat.app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tomas Kozakas
@@ -22,19 +21,18 @@ public class User {
     @EqualsAndHashCode.Include
     private String password;
     @EqualsAndHashCode.Include
-    private Map<String, PrivateMessage> ongoingMessages = new HashMap<>();
-    @EqualsAndHashCode.Include
-    private List<String> chatRoomNames = new ArrayList<>();
-    @JsonIgnore
-    private boolean connectedToChatRoom;
-    @JsonIgnore
-    private boolean connectedToPrivateMessages;
-    @JsonIgnore
-    private String chatRoomName;
+    private List<Chat> chatList = new ArrayList<>();
 
     public User(String name, String password) {
         this.name = name;
         this.password = password;
     }
 
+    public ObservableList<Chat> getChatList() {
+        return FXCollections.observableArrayList(chatList);
+    }
+
+    public void addChat(Chat newChat) {
+        chatList.add(newChat);
+    }
 }

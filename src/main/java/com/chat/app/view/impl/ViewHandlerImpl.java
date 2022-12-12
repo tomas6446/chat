@@ -3,21 +3,18 @@ package com.chat.app.view.impl;
 import com.chat.app.controller.impl.ChatController;
 import com.chat.app.controller.impl.LoginController;
 import com.chat.app.controller.impl.MainController;
-import com.chat.app.controller.impl.RegisterController;
 import com.chat.app.model.Chat;
+import com.chat.app.model.Database;
 import com.chat.app.model.User;
 import com.chat.app.view.ViewHandler;
 import com.chat.app.window.AbstractWindow;
 import com.chat.app.window.impl.ChatWindow;
 import com.chat.app.window.impl.LoginWindow;
 import com.chat.app.window.impl.MainWindow;
-import com.chat.app.window.impl.RegisterWindow;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author Tomas Kozakas
@@ -35,18 +32,13 @@ public class ViewHandlerImpl implements ViewHandler {
     }
 
     @Override
-    public void launchMainWindow(User user, Map<String, User> userMap) throws IOException {
-        showWindow(new MainWindow(new MainController(this, user, userMap)));
+    public void launchMainWindow(User user, Database database) throws IOException {
+        showWindow(new MainWindow(new MainController(this, user, database)));
     }
 
     @Override
-    public void launchRegisterWindow(Map<String, User> userMap) throws IOException {
-        showWindow(new RegisterWindow(new RegisterController(this, userMap)));
-    }
-
-    @Override
-    public void launchChatWindow(Chat recipient, User user, ObservableList<Chat> chatTableList) throws IOException {
-        showWindow(new ChatWindow(new ChatController(this, recipient, user, chatTableList)));
+    public void launchChatWindow(User user, Chat chat, Database database) throws IOException {
+        showWindow(new ChatWindow(new ChatController(this, user, chat, database)));
     }
 
     private void showWindow(AbstractWindow window) throws IOException {
