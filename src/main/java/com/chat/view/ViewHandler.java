@@ -1,8 +1,8 @@
-package com.chat.app.view;
+package com.chat.view;
 
-import com.chat.app.model.Chat;
-import com.chat.app.model.Database;
-import com.chat.app.model.User;
+import com.chat.model.Chat;
+import com.chat.model.Database;
+import com.chat.model.User;
 
 import java.io.IOException;
 

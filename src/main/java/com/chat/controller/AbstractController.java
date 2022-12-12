@@ -1,6 +1,6 @@
-package com.chat.app.controller;
+package com.chat.controller;
 
-import com.chat.app.view.ViewHandler;
+import com.chat.view.ViewHandler;
 import javafx.fxml.Initializable;
 
 /**

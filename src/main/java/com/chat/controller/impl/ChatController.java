@@ -1,10 +1,10 @@
-package com.chat.app.controller.impl;
+package com.chat.controller.impl;
 
-import com.chat.app.controller.AbstractController;
-import com.chat.app.model.Chat;
-import com.chat.app.model.Database;
-import com.chat.app.model.User;
-import com.chat.app.view.impl.ViewHandlerImpl;
+import com.chat.controller.AbstractController;
+import com.chat.model.Chat;
+import com.chat.model.Database;
+import com.chat.model.User;
+import com.chat.view.impl.ViewHandlerImpl;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;

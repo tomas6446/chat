@@ -1,16 +1,16 @@
-package com.chat.app.view.impl;
+package com.chat.view.impl;
 
-import com.chat.app.controller.impl.ChatController;
-import com.chat.app.controller.impl.LoginController;
-import com.chat.app.controller.impl.MainController;
-import com.chat.app.model.Chat;
-import com.chat.app.model.Database;
-import com.chat.app.model.User;
-import com.chat.app.view.ViewHandler;
-import com.chat.app.window.AbstractWindow;
-import com.chat.app.window.impl.ChatWindow;
-import com.chat.app.window.impl.LoginWindow;
-import com.chat.app.window.impl.MainWindow;
+import com.chat.controller.impl.ChatController;
+import com.chat.controller.impl.LoginController;
+import com.chat.controller.impl.MainController;
+import com.chat.model.Chat;
+import com.chat.model.Database;
+import com.chat.model.User;
+import com.chat.view.ViewHandler;
+import com.chat.window.AbstractWindow;
+import com.chat.window.impl.ChatWindow;
+import com.chat.window.impl.LoginWindow;
+import com.chat.window.impl.MainWindow;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 

@@ -1,4 +1,4 @@
-package com.chat.app.model;
+package com.chat.model;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

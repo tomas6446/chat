@@ -1,10 +1,10 @@
-package com.chat.app.controller.impl;
+package com.chat.controller.impl;
 
-import com.chat.app.controller.AbstractController;
-import com.chat.app.listener.Listener;
-import com.chat.app.model.Database;
-import com.chat.app.model.User;
-import com.chat.app.view.ViewHandler;
+import com.chat.controller.AbstractController;
+import com.chat.model.Database;
+import com.chat.model.User;
+import com.chat.server.Listener;
+import com.chat.view.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -41,13 +41,14 @@ public class LoginController extends AbstractController {
                 User foundUser = database.getUser(tfUsername.getText());
                 if (Objects.equals(foundUser.getPassword(), tfPassword.getText())) {
                     try {
-                        this.user = foundUser;
+                        user = foundUser;
+                        viewHandler.launchMainWindow(user, database);
                         Listener listener = new Listener(user, database, viewHandler);
                         Thread thread = new Thread(listener);
-                        viewHandler.launchMainWindow(user, database);
                         thread.start();
+
                     } catch (IOException ex) {
-                        System.out.println("Error login in");
+                        System.err.println("Error launching main window");
                         ex.printStackTrace();
                     }
                 } else {
@@ -60,10 +61,10 @@ public class LoginController extends AbstractController {
     private EventHandler<ActionEvent> register() {
         return e -> {
             if (!database.containsUser(tfUsername.getText())) {
-                user = new User(tfUsername.getText(), tfPassword.getText());
-                database.addUser(user);
-                database.exportData();
                 try {
+                    user = new User(tfUsername.getText(), tfPassword.getText());
+                    database.addUser(user);
+                    database.exportData();
                     viewHandler.launchMainWindow(user, database);
                 } catch (IOException ex) {
                     System.err.println("Error launching main window");

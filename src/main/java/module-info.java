@@ -6,18 +6,18 @@ module com {
     requires com.fasterxml.jackson.databind;
 
 
-    exports com.chat.app;
-    opens com.chat.app.controller to
+    exports com.chat;
+    opens com.chat.controller to
             javafx.fxml;
-    opens com.chat.app.controller.impl to
+    opens com.chat.controller.impl to
             javafx.fxml;
-    opens com.chat.app.window to
+    opens com.chat.window to
             javafx.fxml;
-    opens com.chat.app.view to
+    opens com.chat.view to
             javafx.fxml;
 
-    exports com.chat.app.model;
-    opens com.chat.app.model to
+    exports com.chat.model;
+    opens com.chat.model to
             lombok,
             com.fasterxml.jackson.annotation,
             com.fasterxml.jackson.databind,

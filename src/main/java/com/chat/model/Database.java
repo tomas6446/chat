@@ -1,4 +1,4 @@
-package com.chat.app.model;
+package com.chat.model;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

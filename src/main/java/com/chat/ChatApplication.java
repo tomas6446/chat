@@ -1,6 +1,6 @@
-package com.chat.app;
+package com.chat;
 
-import com.chat.app.view.impl.ViewHandlerImpl;
+import com.chat.view.impl.ViewHandlerImpl;
 import javafx.stage.Stage;
 
 import java.io.IOException;
