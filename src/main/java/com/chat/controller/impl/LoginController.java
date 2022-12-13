@@ -1,7 +1,6 @@
 package com.chat.controller.impl;
 
 import com.chat.controller.AbstractController;
-import com.chat.model.Database;
 import com.chat.model.User;
 import com.chat.server.Listener;
 import com.chat.view.ViewHandler;
@@ -13,15 +12,12 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
  * @author Tomas Kozakas
  */
 public class LoginController extends AbstractController {
-    private final Database database = new Database();
-    private User user = new User();
     @FXML
     private TextField tfUsername;
     @FXML
@@ -37,39 +33,19 @@ public class LoginController extends AbstractController {
 
     private EventHandler<ActionEvent> login() {
         return e -> {
-            if (database.containsUser(tfUsername.getText())) {
-                User foundUser = database.getUser(tfUsername.getText());
-                if (Objects.equals(foundUser.getPassword(), tfPassword.getText())) {
-                    try {
-                        user = foundUser;
-                        viewHandler.launchMainWindow(user, database);
-                        Listener listener = new Listener(user, database, viewHandler);
-                        Thread thread = new Thread(listener);
-                        thread.start();
-
-                    } catch (IOException ex) {
-                        System.err.println("Error launching main window");
-                        ex.printStackTrace();
-                    }
-                } else {
-                    System.err.println("User not resolved");
-                }
-            }
+            Listener listener = new Listener(new User(tfUsername.getText(), tfPassword.getText()), viewHandler);
+            Thread thread = new Thread(listener);
+            thread.start();
         };
     }
 
     private EventHandler<ActionEvent> register() {
         return e -> {
-            if (!database.containsUser(tfUsername.getText())) {
-                try {
-                    user = new User(tfUsername.getText(), tfPassword.getText());
-                    database.addUser(user);
-                    database.exportData();
-                    viewHandler.launchMainWindow(user, database);
-                } catch (IOException ex) {
-                    System.err.println("Error launching main window");
-                    ex.printStackTrace();
-                }
+            try {
+                viewHandler.launchMainWindow();
+            } catch (IOException ex) {
+                System.err.println("Unable to launch main menu");
+                ex.printStackTrace();
             }
         };
     }

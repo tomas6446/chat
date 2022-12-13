@@ -22,9 +22,9 @@ import java.util.ResourceBundle;
  * @author Tomas Kozakas
  */
 public class ChatController extends AbstractController {
-    private final User user;
-    private final Chat chat;
-    private final Database database;
+    private  Chat chat;
+    private  Database database;
+    private  User user;
     @FXML
     private TableColumn<Chat, String> chatCol;
     @FXML
@@ -38,17 +38,14 @@ public class ChatController extends AbstractController {
     @FXML
     private TextField tfRecipient;
 
-    public ChatController(ViewHandlerImpl viewHandler, User user, Chat chat, Database database) {
+    public ChatController(ViewHandlerImpl viewHandler) {
         super(viewHandler);
-        this.user = user;
-        this.chat = chat;
-        this.database = database;
     }
 
     private EventHandler<ActionEvent> back() {
         return e -> {
             try {
-                viewHandler.launchMainWindow(user, database);
+                viewHandler.launchMainWindow();
             } catch (IOException ex) {
                 System.err.println("Unable to go back");
             }
@@ -59,7 +56,7 @@ public class ChatController extends AbstractController {
         return e -> {
             Chat chosenChat = row.getItem();
             try {
-                viewHandler.launchChatWindow(user, chosenChat, database);
+                viewHandler.launchChatWindow();
             } catch (IOException ex) {
                 System.err.println("Unable to launch chosen chat window");
             }

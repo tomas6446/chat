@@ -23,7 +23,6 @@ public class Server implements Runnable {
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("A new client is connected: " + socket);
                 new Handler(socket).start();
             }
         } catch (IOException e) {

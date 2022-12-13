@@ -20,8 +20,8 @@ import java.util.ResourceBundle;
  * @author Tomas Kozakas
  */
 public class MainController extends AbstractController {
-    private final User user;
-    private final Database database;
+    private  User user;
+    private  Database database;
     @FXML
     private TableView<Chat> chatTable;
     @FXML
@@ -43,10 +43,8 @@ public class MainController extends AbstractController {
     @FXML
     private Button btnLogout;
 
-    public MainController(ViewHandlerImpl viewHandler, User user, Database database) {
+    public MainController(ViewHandlerImpl viewHandler) {
         super(viewHandler);
-        this.user = user;
-        this.database = database;
     }
 
     private EventHandler<ActionEvent> logout() {
@@ -63,7 +61,7 @@ public class MainController extends AbstractController {
         return e -> {
             Chat chosenChat = row.getItem();
             try {
-                viewHandler.launchChatWindow(user, chosenChat, database);
+                viewHandler.launchChatWindow();
             } catch (IOException ex) {
                 System.err.println("Unable to launch chosen chat window");
             }
@@ -87,7 +85,7 @@ public class MainController extends AbstractController {
                     database.updateUser(user);
                     database.exportData();
                     try {
-                        viewHandler.launchChatWindow(user, chat, database);
+                        viewHandler.launchChatWindow();
                     } catch (IOException ex) {
                         System.err.println("Unable to launch chosen chat window");
                     }
@@ -100,14 +98,14 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> createRoom() {
         return e -> {
             if (!database.containsChat(tfNewRoomName.getText())) {
-                Chat newChat = new Chat(tfNewRoomName.getText());
+                Chat newChat = new Chat(tfNewRoomName.getText(), false);
                 user.addChat(newChat);
                 database.addChat(newChat);
                 database.updateUser(user);
                 database.exportData();
                 chatTable.setItems(user.getChatList());
                 try {
-                    viewHandler.launchChatWindow(user, newChat, database);
+                    viewHandler.launchChatWindow();
                 } catch (IOException ex) {
                     System.err.println("Unable to create a chat room");
                 }
@@ -118,7 +116,7 @@ public class MainController extends AbstractController {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        laUsername.setText(user.getName());
+        //laUsername.setText(user.getName());
 
         btnLogout.setOnAction(logout());
         btnChatUser.setOnAction(findUser());
