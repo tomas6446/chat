@@ -128,6 +128,6 @@ public class MainController extends AbstractController {
             row.setOnMouseClicked(chat(row));
             return row;
         });
-        chatTable.setItems(user.getChatList());
+        //chatTable.setItems(user.getChatList());
     }
 }

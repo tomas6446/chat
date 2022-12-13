@@ -8,7 +8,6 @@ import com.chat.window.AbstractWindow;
 import com.chat.window.impl.ChatWindow;
 import com.chat.window.impl.LoginWindow;
 import com.chat.window.impl.MainWindow;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -25,29 +24,23 @@ public class ViewHandlerImpl implements ViewHandler {
     }
 
     @Override
-    public void launchLoginWindow() {
+    public void launchLoginWindow() throws IOException {
         showWindow(new LoginWindow(new LoginController(this)));
     }
 
     @Override
-    public void launchMainWindow() {
+    public void launchMainWindow() throws IOException {
         showWindow(new MainWindow(new MainController(this)));
     }
 
     @Override
-    public void launchChatWindow() {
+    public void launchChatWindow() throws IOException {
         showWindow(new ChatWindow(new ChatController(this)));
     }
 
-    private void showWindow(AbstractWindow window) {
-        Platform.runLater(() -> {
-            try {
-                primaryStage.setTitle(window.getTitle());
-                primaryStage.setScene(new Scene(window.root()));
-                primaryStage.show();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+    private void showWindow(AbstractWindow window) throws IOException {
+        primaryStage.setScene(new Scene(window.root()));
+        primaryStage.setTitle(window.getTitle());
+        primaryStage.show();
     }
 }
