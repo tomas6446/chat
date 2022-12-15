@@ -2,6 +2,8 @@ package com.chat.model;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,7 +17,8 @@ import java.util.stream.Collectors;
 /**
  * @author Tomas Kozakas
  */
-
+@Getter
+@Setter
 public class Database {
     private Map<String, Chat> chatMap = new HashMap<>();
     private Map<String, User> userMap = new HashMap<>();

@@ -4,8 +4,13 @@ package com.chat.model;
  * @author Tomas Kozakas
  */
 public enum MessageType {
-    CONNECT,
     LOGIN,
+    REGISTER,
+    CONNECTED,
+    CREATE_ROOM,
+    JOIN_ROOM,
     JOINED_ROOM,
-    JOINED_PRIVATE,
+    JOIN_PRIVATE,
+    SEND,
+    RECEIVE,
 }

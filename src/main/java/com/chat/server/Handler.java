@@ -2,13 +2,13 @@ package com.chat.server;
 
 import com.chat.model.Message;
 import com.chat.model.MessageType;
+import com.chat.model.User;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Objects;
 
 /**
  * @author Tomas Kozakas
@@ -33,15 +33,38 @@ public class Handler extends Thread {
 
             Message message;
             while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
-                System.out.println(message);
-                if (Objects.requireNonNull(message.getMessageType()) == MessageType.CONNECT) {
-                    if (validate.connect(message.getUser())) {
-                        outputStream.writeObject(new Message(message.getUser(), MessageType.LOGIN));
+                System.out.println("Handler: " + message);
+                switch (message.getMessageType()) {
+                    case LOGIN -> {
+                        User user;
+                        if ((user = validate.login(message.getUser())) != null) {
+                            outputStream.writeObject(new Message(user, MessageType.CONNECTED));
+                        }
+                    }
+                    case REGISTER -> {
+                        if (validate.register(message.getUser())) {
+                            outputStream.writeObject(new Message(message.getUser(), MessageType.CONNECTED));
+                        }
+                    }
+                    case JOIN_ROOM -> {
+                        if (validate.joinRoom(message.getChat())) {
+                            outputStream.writeObject(new Message(message.getUser(), message.getChat(), MessageType.JOINED_ROOM));
+                        }
+                    }
+                    case CREATE_ROOM -> {
+                        if (validate.createRoom(message.getChat())) {
+                            outputStream.writeObject(new Message(message.getChat(), MessageType.JOINED_ROOM));
+                        }
+                    }
+                    case SEND -> {
+                        if (validate.sendToRoom(message.getChat(), message.getMessage())) {
+                            outputStream.writeObject(new Message(message.getChat(), message.getMessage(), MessageType.RECEIVE));
+                        }
                     }
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         } finally {
             inputStream.close();
             outputStream.close();

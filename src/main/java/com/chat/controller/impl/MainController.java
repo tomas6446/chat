@@ -2,8 +2,8 @@ package com.chat.controller.impl;
 
 import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
-import com.chat.model.Database;
 import com.chat.model.User;
+import com.chat.server.Listener;
 import com.chat.view.impl.ViewHandlerImpl;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -20,8 +20,8 @@ import java.util.ResourceBundle;
  * @author Tomas Kozakas
  */
 public class MainController extends AbstractController {
-    private  User user;
-    private  Database database;
+    private final User user;
+    private final Listener listener;
     @FXML
     private TableView<Chat> chatTable;
     @FXML
@@ -43,8 +43,10 @@ public class MainController extends AbstractController {
     @FXML
     private Button btnLogout;
 
-    public MainController(ViewHandlerImpl viewHandler) {
-        super(viewHandler);
+    public MainController(ViewHandlerImpl viewHandler, Listener listener) {
+        super(viewHandler, listener);
+        this.listener = listener;
+        this.user = listener.getUser();
     }
 
     private EventHandler<ActionEvent> logout() {
@@ -61,7 +63,7 @@ public class MainController extends AbstractController {
         return e -> {
             Chat chosenChat = row.getItem();
             try {
-                viewHandler.launchChatWindow();
+                listener.joinRoom(chosenChat);
             } catch (IOException ex) {
                 System.err.println("Unable to launch chosen chat window");
             }
@@ -70,45 +72,26 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> findUser() {
         return e -> {
-            if (database.containsUser(tfRoomName.getText())) {
 
-            }
         };
     }
 
     private EventHandler<ActionEvent> findRoom() {
         return e -> {
-            if (database.containsChat(tfRoomName.getText())) {
-                Chat chat = database.getChat(tfRoomName.getText());
-                if (!user.getChatList().contains(chat)) {
-                    user.addChat(chat);
-                    database.updateUser(user);
-                    database.exportData();
-                    try {
-                        viewHandler.launchChatWindow();
-                    } catch (IOException ex) {
-                        System.err.println("Unable to launch chosen chat window");
-                    }
-                }
-
+            try {
+                listener.joinRoom(new Chat(tfRoomName.getText(), false));
+            } catch (IOException ex) {
+                System.err.println("Unable to join a chat room");
             }
         };
     }
 
     private EventHandler<ActionEvent> createRoom() {
         return e -> {
-            if (!database.containsChat(tfNewRoomName.getText())) {
-                Chat newChat = new Chat(tfNewRoomName.getText(), false);
-                user.addChat(newChat);
-                database.addChat(newChat);
-                database.updateUser(user);
-                database.exportData();
-                chatTable.setItems(user.getChatList());
-                try {
-                    viewHandler.launchChatWindow();
-                } catch (IOException ex) {
-                    System.err.println("Unable to create a chat room");
-                }
+            try {
+                listener.createRoom(new Chat(tfNewRoomName.getText(), false));
+            } catch (IOException ex) {
+                System.err.println("Unable to create a chat room");
             }
         };
     }
@@ -116,7 +99,7 @@ public class MainController extends AbstractController {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        //laUsername.setText(user.getName());
+        laUsername.setText(user.getName());
 
         btnLogout.setOnAction(logout());
         btnChatUser.setOnAction(findUser());
@@ -128,6 +111,6 @@ public class MainController extends AbstractController {
             row.setOnMouseClicked(chat(row));
             return row;
         });
-        //chatTable.setItems(user.getChatList());
+        chatTable.setItems(user.getChatList());
     }
 }
