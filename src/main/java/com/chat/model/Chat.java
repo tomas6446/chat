@@ -21,7 +21,7 @@ public class Chat implements Serializable {
     private List<String> messages = new ArrayList<>();
     private String name;
 
-    public Chat(String name, boolean privateRoom) {
+    public Chat(String name) {
         this.name = name;
         this.privateRoom = privateRoom;
     }

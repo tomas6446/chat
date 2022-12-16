@@ -1,5 +1,6 @@
 package com.chat.server;
 
+import com.chat.model.Chat;
 import com.chat.model.Message;
 import com.chat.model.MessageType;
 import com.chat.model.User;
@@ -47,18 +48,24 @@ public class Handler extends Thread {
                         }
                     }
                     case JOIN_ROOM -> {
-                        if (validate.joinRoom(message.getChat())) {
-                            outputStream.writeObject(new Message(message.getUser(), message.getChat(), MessageType.JOINED_ROOM));
+                        User user;
+                        if ((user = validate.joinRoom(message.getUser(), message.getChat())) != null) {
+                            outputStream.writeObject(new Message(user, message.getChat(), MessageType.JOINED_ROOM));
                         }
                     }
                     case CREATE_ROOM -> {
-                        if (validate.createRoom(message.getChat())) {
-                            outputStream.writeObject(new Message(message.getChat(), MessageType.JOINED_ROOM));
+                        User user;
+                        if ((user = validate.createRoom(message.getUser(), message.getChat())) != null) {
+                            outputStream.writeObject(new Message(user, message.getChat(), MessageType.JOINED_ROOM));
                         }
                     }
+                    case JOIN_PRIVATE -> {
+
+                    }
                     case SEND -> {
-                        if (validate.sendToRoom(message.getChat(), message.getMessage())) {
-                            outputStream.writeObject(new Message(message.getChat(), message.getMessage(), MessageType.RECEIVE));
+                        Chat chat;
+                        if ((chat = validate.sendToRoom(message.getUser(), message.getChat(), message.getMessage())) != null) {
+                            outputStream.writeObject(new Message(message.getUser(), chat, message.getMessage(), MessageType.RECEIVE));
                         }
                     }
                 }

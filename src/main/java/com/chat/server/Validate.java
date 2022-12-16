@@ -26,12 +26,21 @@ public class Validate {
         return database.getUser(user.getName());
     }
 
-    public boolean joinRoom(Chat chat) {
-        return database.containsChat(chat.getName());
+    public User joinRoom(User user, Chat chat) {
+        if (!database.containsChat(chat.getName())) {
+            return null;
+        }
+        if (!user.getChatList().contains(chat)) {
+            user.addChat(chat);
+            database.replaceUser(user);
+            database.exportData();
+        }
+
+        return user;
     }
 
     public boolean register(User user) {
-        if (database.containsChat(user.getName())) {
+        if (database.containsUser(user.getName())) {
             return false;
         }
         database.addUser(user);
@@ -39,27 +48,37 @@ public class Validate {
         return true;
     }
 
-    public boolean createRoom(Chat chat) {
-        if (database.containsChat(chat.getName())) {
-            return false;
+    public User createRoom(User user, Chat chat) {
+        if (!database.containsChat(chat.getName())) {
+            return null;
         }
         database.addChat(chat);
+        user.addChat(chat);
+        database.replaceUser(user);
+
         database.exportData();
-        return true;
+        return user;
     }
 
-    public boolean sendToRoom(Chat chat, String message) {
+    public Chat sendToRoom(User user, Chat chat, String message) {
         if (!database.containsChat(chat.getName())) {
-            return false;
+            return null;
         }
 
+        chat.getMessages().add(message);
+        // Add for user that sends the message
+        user.getChatList().forEach(c -> {
+            if (Objects.equals(c.getName(), chat.getName())) {
+                c.getMessages().add(message);
+            }
+        });
         // Each user that has this chat in the list gets a message
-        database.getUserMap().forEach((s, user) -> user.getChatList().forEach(c -> {
+        database.getUserMap().forEach((s, u) -> u.getChatList().forEach(c -> {
             if (Objects.equals(c.getName(), chat.getName())) {
                 c.getMessages().add(message);
             }
         }));
         database.exportData();
-        return true;
+        return chat;
     }
 }

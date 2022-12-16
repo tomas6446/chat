@@ -3,7 +3,6 @@ package com.chat.view.impl;
 import com.chat.controller.impl.ChatController;
 import com.chat.controller.impl.LoginController;
 import com.chat.controller.impl.MainController;
-import com.chat.model.Chat;
 import com.chat.server.Listener;
 import com.chat.view.ViewHandler;
 import com.chat.window.AbstractWindow;
@@ -37,8 +36,8 @@ public class ViewHandlerImpl implements ViewHandler {
     }
 
     @Override
-    public void launchChatWindow(Listener listener, Chat chat) {
-        showWindow(new ChatWindow(new ChatController(this, listener, chat)));
+    public void launchChatWindow(Listener listener) {
+        showWindow(new ChatWindow(new ChatController(this, listener)));
     }
 
     private void showWindow(AbstractWindow window) {

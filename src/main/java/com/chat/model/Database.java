@@ -90,4 +90,8 @@ public class Database {
     public List<String> getChatMessages(String name) {
         return chatMap.get(name).getMessages();
     }
+
+    public void replaceUser(User user) {
+        userMap.replace(user.getName(), user);
+    }
 }

@@ -4,7 +4,7 @@ import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
 import com.chat.model.User;
 import com.chat.server.Listener;
-import com.chat.view.impl.ViewHandlerImpl;
+import com.chat.view.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -38,11 +38,11 @@ public class ChatController extends AbstractController {
     @FXML
     private TextField tfRecipient;
 
-    public ChatController(ViewHandlerImpl viewHandler, Listener listener, Chat chat) {
+    public ChatController(ViewHandler viewHandler, Listener listener) {
         super(viewHandler, listener);
         this.listener = listener;
-        this.chat = chat;
         this.user = listener.getUser();
+        this.chat = listener.getChat();
     }
 
     private EventHandler<ActionEvent> back() {
@@ -58,11 +58,12 @@ public class ChatController extends AbstractController {
 
     private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
         return e -> {
-            Chat chosenChat = row.getItem();
             try {
-                viewHandler.launchChatWindow(listener, chosenChat);
+                if (row != null) {
+                    listener.joinRoom(row.getItem());
+                }
             } catch (IOException ex) {
-                System.err.println("Unable to launch chosen chat window");
+                System.err.println("Unable to join a chat room");
                 ex.printStackTrace();
             }
         };
@@ -72,9 +73,10 @@ public class ChatController extends AbstractController {
         return e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 try {
-                    String message = user.getName() + ": " + tfInput.getText() + "\n";
-                    taOutput.appendText(message);
-                    listener.sendMessage(chat, message);
+                    String sendMessage = user.getName() + ": " + tfInput.getText() + "\n";
+                    taOutput.appendText(sendMessage);
+                    listener.sendMessage(chat, sendMessage);
+
                     tfInput.clear();
                 } catch (IOException ex) {
                     System.err.println("Unable to send a message");
@@ -84,14 +86,17 @@ public class ChatController extends AbstractController {
         };
     }
 
+    public void receive(String message) {
+        if(taOutput != null) {
+            taOutput.appendText(message);
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         chat.getMessages().forEach(msg -> taOutput.appendText(msg));
         tfRecipient.setText(chat.getName());
-        btnBack.setOnAction(back());
-
-        tfInput.setOnKeyPressed(sendMessage());
 
         chatTable.setRowFactory(e -> {
             TableRow<Chat> row = new TableRow<>();
@@ -99,5 +104,9 @@ public class ChatController extends AbstractController {
             return row;
         });
         chatTable.setItems(user.getChatList());
+        btnBack.setOnAction(back());
+        tfInput.setOnKeyPressed(sendMessage());
     }
+
+
 }

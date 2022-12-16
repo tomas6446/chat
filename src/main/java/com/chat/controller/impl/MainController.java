@@ -4,7 +4,7 @@ import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
 import com.chat.model.User;
 import com.chat.server.Listener;
-import com.chat.view.impl.ViewHandlerImpl;
+import com.chat.view.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -43,7 +43,7 @@ public class MainController extends AbstractController {
     @FXML
     private Button btnLogout;
 
-    public MainController(ViewHandlerImpl viewHandler, Listener listener) {
+    public MainController(ViewHandler viewHandler, Listener listener) {
         super(viewHandler, listener);
         this.listener = listener;
         this.user = listener.getUser();
@@ -61,25 +61,31 @@ public class MainController extends AbstractController {
 
     private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
         return e -> {
-            Chat chosenChat = row.getItem();
-            try {
-                listener.joinRoom(chosenChat);
-            } catch (IOException ex) {
-                System.err.println("Unable to launch chosen chat window");
+            if (row != null) {
+                Chat chosenChat = row.getItem();
+                try {
+                    listener.joinRoom(chosenChat);
+                } catch (IOException ex) {
+                    System.err.println("Unable to launch chosen chat window");
+                }
             }
         };
     }
 
     private EventHandler<ActionEvent> findUser() {
         return e -> {
-
+            try {
+                listener.joinPrivate(tfRecipient.getText());
+            } catch (Exception ex) {
+                System.err.println("Unable to join a private room");
+            }
         };
     }
 
     private EventHandler<ActionEvent> findRoom() {
         return e -> {
             try {
-                listener.joinRoom(new Chat(tfRoomName.getText(), false));
+                listener.joinRoom(new Chat(tfRoomName.getText()));
             } catch (IOException ex) {
                 System.err.println("Unable to join a chat room");
             }
@@ -89,7 +95,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> createRoom() {
         return e -> {
             try {
-                listener.createRoom(new Chat(tfNewRoomName.getText(), false));
+                listener.createRoom(new Chat(tfNewRoomName.getText()));
             } catch (IOException ex) {
                 System.err.println("Unable to create a chat room");
             }
