@@ -6,12 +6,15 @@ import lombok.SneakyThrows;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Tomas Kozakas
  */
 @Getter
 public class Server implements Runnable {
+    private final List<Handler> connections = new ArrayList<>();
     private ServerSocket serverSocket;
 
     @SneakyThrows
@@ -23,7 +26,10 @@ public class Server implements Runnable {
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                new Handler(socket).start();
+                Handler handler = new Handler(this, socket);
+                Thread thread = new Thread(handler);
+                connections.add(handler);
+                thread.start();
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());

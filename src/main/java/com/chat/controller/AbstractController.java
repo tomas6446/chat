@@ -1,6 +1,6 @@
 package com.chat.controller;
 
-import com.chat.server.Listener;
+import com.chat.server.Client;
 import com.chat.view.ViewHandler;
 import javafx.fxml.Initializable;
 
@@ -10,7 +10,7 @@ import javafx.fxml.Initializable;
 public abstract class AbstractController implements Initializable {
     protected final ViewHandler viewHandler;
 
-    protected AbstractController(ViewHandler viewHandler, Listener listener) {
+    protected AbstractController(ViewHandler viewHandler, Client client) {
         this.viewHandler = viewHandler;
     }
 }

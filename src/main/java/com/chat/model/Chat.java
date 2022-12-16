@@ -17,12 +17,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Chat implements Serializable {
-    boolean privateRoom;
     private List<String> messages = new ArrayList<>();
     private String name;
 
     public Chat(String name) {
         this.name = name;
-        this.privateRoom = privateRoom;
     }
 }

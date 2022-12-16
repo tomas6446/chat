@@ -4,7 +4,7 @@ import com.chat.controller.AbstractController;
 import com.chat.model.Message;
 import com.chat.model.MessageType;
 import com.chat.model.User;
-import com.chat.server.Listener;
+import com.chat.server.Client;
 import com.chat.view.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -20,7 +20,7 @@ import java.util.ResourceBundle;
  */
 public class LoginController extends AbstractController {
     private User user;
-    private Listener listener;
+    private Client client;
     @FXML
     private TextField tfUsername;
     @FXML
@@ -37,8 +37,8 @@ public class LoginController extends AbstractController {
     private EventHandler<ActionEvent> login() {
         return e -> {
             user = new User(tfUsername.getText(), tfPassword.getText());
-            listener = new Listener(user, viewHandler, new Message(user, MessageType.LOGIN));
-            Thread thread = new Thread(listener);
+            client = new Client(viewHandler, new Message(user, MessageType.LOGIN));
+            Thread thread = new Thread(client);
             thread.start();
         };
     }
@@ -46,8 +46,8 @@ public class LoginController extends AbstractController {
     private EventHandler<ActionEvent> register() {
         return e -> {
             user = new User(tfUsername.getText(), tfPassword.getText());
-            listener = new Listener(user, viewHandler, new Message(user, MessageType.REGISTER));
-            Thread thread = new Thread(listener);
+            client = new Client(viewHandler, new Message(user, MessageType.REGISTER));
+            Thread thread = new Thread(client);
             thread.start();
         };
     }

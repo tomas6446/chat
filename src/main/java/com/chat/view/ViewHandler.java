@@ -1,6 +1,6 @@
 package com.chat.view;
 
-import com.chat.server.Listener;
+import com.chat.server.Client;
 
 import java.io.IOException;
 
@@ -10,7 +10,7 @@ import java.io.IOException;
 public interface ViewHandler {
     void launchLoginWindow() throws IOException;
 
-    void launchMainWindow(Listener listener) throws IOException;
+    void launchMainWindow(Client client) throws IOException;
 
-    void launchChatWindow(Listener listener) throws IOException;
+    void launchChatWindow(Client client) throws IOException;
 }

@@ -14,13 +14,14 @@ import java.net.Socket;
 /**
  * @author Tomas Kozakas
  */
-public class Handler extends Thread {
-    private final Socket socket;
+public class Handler implements Runnable {
     private final Validate validate = new Validate();
+
+    private final Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
 
-    public Handler(Socket socket) {
+    public Handler(Server server, Socket socket) {
         this.socket = socket;
     }
 
@@ -35,37 +36,22 @@ public class Handler extends Thread {
             Message message;
             while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
                 System.out.println("Handler: " + message);
+                User user = message.getUser();
+                Chat chat = message.getChat();
                 switch (message.getMessageType()) {
                     case LOGIN -> {
-                        User user;
-                        if ((user = validate.login(message.getUser())) != null) {
-                            outputStream.writeObject(new Message(user, MessageType.CONNECTED));
+                        if (validate.login(user) != null) {
+                            outputStream.writeObject(new Message(user, chat, MessageType.CONNECTED));
                         }
                     }
                     case REGISTER -> {
-                        if (validate.register(message.getUser())) {
-                            outputStream.writeObject(new Message(message.getUser(), MessageType.CONNECTED));
-                        }
-                    }
-                    case JOIN_ROOM -> {
-                        User user;
-                        if ((user = validate.joinRoom(message.getUser(), message.getChat())) != null) {
-                            outputStream.writeObject(new Message(user, message.getChat(), MessageType.JOINED_ROOM));
+                        if (validate.register(user)) {
+                            outputStream.writeObject(new Message(user, chat, MessageType.CONNECTED));
                         }
                     }
                     case CREATE_ROOM -> {
-                        User user;
-                        if ((user = validate.createRoom(message.getUser(), message.getChat())) != null) {
-                            outputStream.writeObject(new Message(user, message.getChat(), MessageType.JOINED_ROOM));
-                        }
-                    }
-                    case JOIN_PRIVATE -> {
-
-                    }
-                    case SEND -> {
-                        Chat chat;
-                        if ((chat = validate.sendToRoom(message.getUser(), message.getChat(), message.getMessage())) != null) {
-                            outputStream.writeObject(new Message(message.getUser(), chat, message.getMessage(), MessageType.RECEIVE));
+                        if (validate.createRoom(user, chat)) {
+                            outputStream.writeObject(new Message(user, chat, MessageType.JOINED_ROOM));
                         }
                     }
                 }
