@@ -1,6 +1,10 @@
 package com.chat.model;
 
-import lombok.*;
+import com.chat.server.Client;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -12,10 +16,16 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 public class Message implements Serializable {
+    private Client client;
     private String message;
     private User user;
     private Chat chat;
     private MessageType messageType;
+
+    public Message(Client client, MessageType messageType) {
+        this.client = client;
+        this.messageType = messageType;
+    }
 
     public Message(User user, MessageType messageType) {
         this.user = user;

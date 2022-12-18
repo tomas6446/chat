@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Tomas Kozakas
@@ -19,18 +20,27 @@ import java.util.List;
 public class User implements Serializable {
     private String name;
     private String password;
-    private List<String> availableChat = new ArrayList<>();
+    private List<Chat> availableChat = new ArrayList<>();
 
     public User(String name, String password) {
         this.name = name;
         this.password = password;
     }
 
-    public ObservableList<String> getAvailableChat() {
+    public ObservableList<Chat> getAvailableChat() {
         return FXCollections.observableArrayList(availableChat);
     }
 
-    public void addChat(String name) {
-        availableChat.add(name);
+    public void addChat(Chat newChat) {
+        availableChat.add(newChat);
+    }
+
+    public boolean containsChat(String name) {
+        for (Chat chat : availableChat) {
+            if (Objects.equals(chat.getName(), name)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

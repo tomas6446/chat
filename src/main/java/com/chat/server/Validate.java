@@ -27,7 +27,7 @@ public class Validate {
         if (!database.containsChat(chat.getName())) {
             return null;
         }
-        if (!user.getChatList().contains(chat)) {
+        if (!user.containsChat(chat.getName())) {
             user.addChat(database.getChat(chat.getName()));
             database.replaceUser(user);
             database.exportData();
@@ -61,7 +61,7 @@ public class Validate {
         }
         chat.addMessage(message);
         // Each user that has this chat in the list gets a message
-        database.getUserMap().forEach((s, user) -> user.getChatList().forEach(c -> {
+        database.getUserMap().forEach((s, user) -> user.getAvailableChat().forEach(c -> {
             if (Objects.equals(c.getName(), chat.getName())) {
                 c.getMessages().add(message);
             }

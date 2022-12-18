@@ -58,9 +58,9 @@ public class ChatController extends AbstractController {
     private EventHandler<KeyEvent> sendMessage() {
         return e -> {
             if (e.getCode() == KeyCode.ENTER) {
-                String message = user.getName() + ": " + tfInput.getText() + "\n";
-                taOutput.appendText(message);
-                client.sendMessage(message);
+                String msg = user.getName() + ": " + tfInput.getText() + "\n";
+                client.sendMessage(msg);
+                taOutput.appendText(msg);
                 tfInput.clear();
             }
         };
@@ -74,12 +74,11 @@ public class ChatController extends AbstractController {
         btnBack.setOnAction(back());
 
         tfInput.setOnKeyPressed(sendMessage());
-
         chatTable.setRowFactory(e -> {
             TableRow<Chat> row = new TableRow<>();
             row.setOnMouseClicked(chat(row));
             return row;
         });
-        chatTable.setItems(user.getChatList());
+        chatTable.setItems(user.getAvailableChat());
     }
 }
