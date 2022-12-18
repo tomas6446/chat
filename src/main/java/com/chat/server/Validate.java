@@ -4,6 +4,8 @@ import com.chat.model.Chat;
 import com.chat.model.Database;
 import com.chat.model.User;
 
+import java.util.Objects;
+
 /**
  * @author Tomas Kozakas
  */
@@ -14,16 +16,27 @@ public class Validate {
         database.importData();
     }
 
-
     public User login(User user) {
         if (!database.containsUser(user.getName())) {
             return null;
         }
-        return database.getUser(user.getName()).getPassword().equals(user.getPassword()) ? database.getUser(user.getName()) : null;
+        return !database.getUser(user.getName()).getPassword().equals(user.getName()) ? null : database.getUser(user.getName());
+    }
+
+    public User joinRoom(User user, Chat chat) {
+        if (!database.containsChat(chat.getName())) {
+            return null;
+        }
+        if (!user.getChatList().contains(chat)) {
+            user.addChat(database.getChat(chat.getName()));
+            database.replaceUser(user);
+            database.exportData();
+        }
+        return user;
     }
 
     public boolean register(User user) {
-        if (database.containsUser(user.getName())) {
+        if (database.containsChat(user.getName())) {
             return false;
         }
         database.addUser(user);
@@ -35,22 +48,25 @@ public class Validate {
         if (database.containsChat(chat.getName())) {
             return null;
         }
-        user.addChat(chat.getName());
+        user.addChat(chat);
         database.replaceUser(user);
         database.addChat(chat);
         database.exportData();
         return user;
     }
 
-    public User joinRoom(User user, Chat chat) {
+    public Chat sendToRoom(Chat chat, String message) {
         if (!database.containsChat(chat.getName())) {
             return null;
         }
-        if (!user.getAvailableChat().contains(chat.getName())) {
-            user.addChat(chat.getName());
-            database.replaceUser(user);
-            database.exportData();
-        }
-        return user;
+        chat.addMessage(message);
+        // Each user that has this chat in the list gets a message
+        database.getUserMap().forEach((s, user) -> user.getChatList().forEach(c -> {
+            if (Objects.equals(c.getName(), chat.getName())) {
+                c.getMessages().add(message);
+            }
+        }));
+        database.exportData();
+        return chat;
     }
 }

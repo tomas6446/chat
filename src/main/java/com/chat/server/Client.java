@@ -25,51 +25,58 @@ public class Client implements Runnable {
     private ViewHandler viewHandler;
     private Message message;
 
-    private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
 
-
-    public Client(ViewHandler viewHandler, Message message) {
+    public Client(User user, ViewHandler viewHandler, Message message) {
         this.viewHandler = viewHandler;
-        this.user = message.getUser();
+        this.user = user;
         this.message = message;
     }
 
     @Override
     public void run() {
         try {
-            socket = new Socket("127.0.0.1", 5000);
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            inputStream = new ObjectInputStream(socket.getInputStream());
-            System.out.println("Connection accepted " + socket.getInetAddress() + ":" + socket.getPort());
-            connect();
+            try (Socket socket = new Socket("127.0.0.1", 5000)) {
+                outputStream = new ObjectOutputStream(socket.getOutputStream());
+                inputStream = new ObjectInputStream(socket.getInputStream());
+                System.out.println("Connection accepted " + socket.getInetAddress() + ":" + socket.getPort());
+                connect();
 
-
-            while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
-                System.out.println("Client: " + message);
-                user = message.getUser();
-                chat = message.getChat();
-                switch (message.getMessageType()) {
-                    case CONNECTED -> viewHandler.launchMainWindow(this);
-                    case JOINED_ROOM -> viewHandler.launchChatWindow(this);
+                while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
+                    System.out.println("Listener: " + message);
+                    user = message.getUser();
+                    chat = message.getChat();
+                    switch (message.getMessageType()) {
+                        case CONNECTED -> main();
+                        case JOINED_ROOM -> chat();
+                        case RECEIVE -> System.out.println(message);
+                    }
                 }
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
+            System.err.println("Could not connect to server");
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    @SneakyThrows
-    public void connect() {
-        outputStream.writeObject(message);
-        user = message.getUser();
-        chat = message.getChat();
+    private void connect() {
+        switch (message.getMessageType()) {
+            case LOGIN -> login();
+            case REGISTER -> register();
+        }
     }
 
     @SneakyThrows
-    public void createRoom(Chat chat) {
-        outputStream.writeObject(new Message(user, chat, MessageType.CREATE_ROOM));
+    private void register() {
+        outputStream.writeObject(new Message(user, chat, message.getMessage(), MessageType.REGISTER));
+    }
+
+    @SneakyThrows
+    private void login() {
+        outputStream.writeObject(new Message(user, chat, message.getMessage(), MessageType.LOGIN));
     }
 
     @SneakyThrows
@@ -78,7 +85,27 @@ public class Client implements Runnable {
     }
 
     @SneakyThrows
+    public void createRoom(Chat chat) {
+        outputStream.writeObject(new Message(user, chat, MessageType.CREATE_ROOM));
+    }
+
+    @SneakyThrows
+    public void sendMessage(String message) {
+        outputStream.writeObject(new Message(user, chat, message, MessageType.SEND));
+    }
+
+    @SneakyThrows
     public void auth() {
         viewHandler.launchLoginWindow();
+    }
+
+    @SneakyThrows
+    public void main() {
+        viewHandler.launchMainWindow(this);
+    }
+
+    @SneakyThrows
+    public void chat() {
+        viewHandler.launchChatWindow(this);
     }
 }

@@ -9,12 +9,18 @@ import java.io.Serializable;
  */
 @Setter
 @Getter
-@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class Message implements Serializable {
+    private String message;
     private User user;
     private Chat chat;
     private MessageType messageType;
+
+    public Message(User user, MessageType messageType) {
+        this.user = user;
+        this.messageType = messageType;
+    }
 
     public Message(User user, Chat chat, MessageType messageType) {
         this.user = user;
@@ -22,12 +28,10 @@ public class Message implements Serializable {
         this.messageType = messageType;
     }
 
-    public Message(User user, MessageType messageType) {
+    public Message(User user, Chat chat, String message, MessageType messageType) {
         this.user = user;
-        this.messageType = messageType;
-    }
-
-    public Message(MessageType messageType) {
+        this.chat = chat;
+        this.message = message;
         this.messageType = messageType;
     }
 }

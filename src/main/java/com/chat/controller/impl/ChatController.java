@@ -4,17 +4,16 @@ import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
 import com.chat.model.User;
 import com.chat.server.Client;
-import com.chat.view.ViewHandler;
-import javafx.beans.property.SimpleStringProperty;
+import com.chat.view.impl.ViewHandlerImpl;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -26,9 +25,9 @@ public class ChatController extends AbstractController {
     private final Chat chat;
     private final Client client;
     @FXML
-    private TableColumn<String, String> chatCol;
+    private TableColumn<Chat, String> chatCol;
     @FXML
-    private TableView<String> chatTable;
+    private TableView<Chat> chatTable;
     @FXML
     private Button btnBack;
     @FXML
@@ -38,7 +37,7 @@ public class ChatController extends AbstractController {
     @FXML
     private TextField tfRecipient;
 
-    public ChatController(ViewHandler viewHandler, Client client) {
+    public ChatController(ViewHandlerImpl viewHandler, Client client) {
         super(viewHandler, client);
         this.client = client;
         this.chat = client.getChat();
@@ -46,47 +45,41 @@ public class ChatController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> back() {
-        return e -> {
-            try {
-                viewHandler.launchMainWindow(client);
-            } catch (IOException ex) {
-                System.err.println("Unable to go back to main window");
-                ex.printStackTrace();
-            }
-        };
+        return e -> client.main();
     }
 
-    private EventHandler<MouseEvent> chat(TableRow<String> row) {
+    private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
         return e -> {
-            if (row != null) {
-                client.joinRoom(new Chat(row.getText()));
-            }
+            Chat chosenChat = row.getItem();
+            client.joinRoom(chosenChat);
         };
     }
 
     private EventHandler<KeyEvent> sendMessage() {
         return e -> {
             if (e.getCode() == KeyCode.ENTER) {
-
+                String message = user.getName() + ": " + tfInput.getText() + "\n";
+                taOutput.appendText(message);
+                client.sendMessage(message);
+                tfInput.clear();
             }
         };
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        chat.getMessages().forEach(msg -> taOutput.appendText(msg));
         tfRecipient.setText(chat.getName());
-
-        chatCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
-        chatTable.setRowFactory(this::handleTable);
-        chatTable.setItems(user.getAvailableChat());
         btnBack.setOnAction(back());
+
         tfInput.setOnKeyPressed(sendMessage());
-    }
 
-
-    private TableRow<String> handleTable(TableView<String> e) {
-        TableRow<String> row = new TableRow<>();
-        row.setOnMouseClicked(chat(row));
-        return row;
+        chatTable.setRowFactory(e -> {
+            TableRow<Chat> row = new TableRow<>();
+            row.setOnMouseClicked(chat(row));
+            return row;
+        });
+        chatTable.setItems(user.getChatList());
     }
 }

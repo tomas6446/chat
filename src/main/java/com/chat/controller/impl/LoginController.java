@@ -37,7 +37,7 @@ public class LoginController extends AbstractController {
     private EventHandler<ActionEvent> login() {
         return e -> {
             user = new User(tfUsername.getText(), tfPassword.getText());
-            client = new Client(viewHandler, new Message(user, MessageType.LOGIN));
+            client = new Client(user, viewHandler, new Message(user, MessageType.LOGIN));
             Thread thread = new Thread(client);
             thread.start();
         };
@@ -46,7 +46,7 @@ public class LoginController extends AbstractController {
     private EventHandler<ActionEvent> register() {
         return e -> {
             user = new User(tfUsername.getText(), tfPassword.getText());
-            client = new Client(viewHandler, new Message(user, MessageType.REGISTER));
+            client = new Client(user, viewHandler, new Message(user, MessageType.REGISTER));
             Thread thread = new Thread(client);
             thread.start();
         };

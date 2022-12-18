@@ -4,12 +4,12 @@ import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
 import com.chat.model.User;
 import com.chat.server.Client;
-import com.chat.view.ViewHandler;
-import javafx.beans.property.SimpleStringProperty;
+import com.chat.view.impl.ViewHandlerImpl;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 
 import java.net.URL;
@@ -22,9 +22,9 @@ public class MainController extends AbstractController {
     private final User user;
     private final Client client;
     @FXML
-    private TableView<String> chatTable;
+    private TableView<Chat> chatTable;
     @FXML
-    private TableColumn<String, String> chatCol;
+    private TableColumn<Chat, String> chatCol;
     @FXML
     private Label laUsername;
     @FXML
@@ -42,7 +42,7 @@ public class MainController extends AbstractController {
     @FXML
     private Button btnLogout;
 
-    public MainController(ViewHandler viewHandler, Client client) {
+    public MainController(ViewHandlerImpl viewHandler, Client client) {
         super(viewHandler, client);
         this.client = client;
         this.user = client.getUser();
@@ -52,11 +52,10 @@ public class MainController extends AbstractController {
         return e -> client.auth();
     }
 
-    private EventHandler<MouseEvent> chat(TableRow<String> row) {
+    private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
         return e -> {
-            if (row != null) {
-                client.joinRoom(new Chat(row.getText()));
-            }
+            Chat chosenChat = row.getItem();
+            client.joinRoom(chosenChat);
         };
     }
 
@@ -76,20 +75,19 @@ public class MainController extends AbstractController {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         laUsername.setText(user.getName());
+
         btnLogout.setOnAction(logout());
         btnChatUser.setOnAction(findUser());
         btnChatRoom.setOnAction(findRoom());
         btnCreateRoom.setOnAction(createRoom());
 
-        chatCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
-        chatTable.setRowFactory(this::handleTable);
-        chatTable.setItems(user.getAvailableChat());
-    }
-
-    private TableRow<String> handleTable(TableView<String> e) {
-        TableRow<String> row = new TableRow<>();
-        row.setOnMouseClicked(chat(row));
-        return row;
+        chatTable.setRowFactory(chat -> {
+            TableRow<Chat> row = new TableRow<>();
+            row.setOnMouseClicked(chat(row));
+            return row;
+        });
+        chatTable.setItems(user.getChatList());
     }
 }
