@@ -4,6 +4,7 @@ package com.chat.model;
  * @author Tomas Kozakas
  */
 public enum MessageType {
+    AUTH_WINDOW,
     LOGIN,
     REGISTER,
     CONNECTED,

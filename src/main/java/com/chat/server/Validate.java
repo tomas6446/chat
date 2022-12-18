@@ -31,14 +31,26 @@ public class Validate {
         return true;
     }
 
-    public boolean createRoom(User user, Chat chat) {
+    public User createRoom(User user, Chat chat) {
         if (database.containsChat(chat.getName())) {
-            return false;
+            return null;
         }
-        user.getAvailableChat().add(chat.getName());
+        user.addChat(chat.getName());
         database.replaceUser(user);
         database.addChat(chat);
         database.exportData();
-        return true;
+        return user;
+    }
+
+    public User joinRoom(User user, Chat chat) {
+        if (!database.containsChat(chat.getName())) {
+            return null;
+        }
+        if (!user.getAvailableChat().contains(chat.getName())) {
+            user.addChat(chat.getName());
+            database.replaceUser(user);
+            database.exportData();
+        }
+        return user;
     }
 }

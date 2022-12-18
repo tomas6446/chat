@@ -50,7 +50,12 @@ public class Handler implements Runnable {
                         }
                     }
                     case CREATE_ROOM -> {
-                        if (validate.createRoom(user, chat)) {
+                        if ((user = validate.createRoom(user, chat)) != null) {
+                            outputStream.writeObject(new Message(user, chat, MessageType.JOINED_ROOM));
+                        }
+                    }
+                    case JOIN_ROOM -> {
+                        if ((user = validate.joinRoom(user, chat)) != null) {
                             outputStream.writeObject(new Message(user, chat, MessageType.JOINED_ROOM));
                         }
                     }

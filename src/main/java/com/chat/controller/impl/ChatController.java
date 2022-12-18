@@ -58,7 +58,9 @@ public class ChatController extends AbstractController {
 
     private EventHandler<MouseEvent> chat(TableRow<String> row) {
         return e -> {
-
+            if (row != null) {
+                client.joinRoom(new Chat(row.getText()));
+            }
         };
     }
 
@@ -68,12 +70,6 @@ public class ChatController extends AbstractController {
 
             }
         };
-    }
-
-    public void receive(String message) {
-        if (taOutput != null) {
-            taOutput.appendText(message);
-        }
     }
 
     @Override

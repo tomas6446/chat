@@ -12,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -50,19 +49,13 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> logout() {
-        return e -> {
-            try {
-                viewHandler.launchLoginWindow();
-            } catch (IOException ex) {
-                System.err.println("Unable to logout");
-            }
-        };
+        return e -> client.auth();
     }
 
     private EventHandler<MouseEvent> chat(TableRow<String> row) {
         return e -> {
             if (row != null) {
-
+                client.joinRoom(new Chat(row.getText()));
             }
         };
     }
@@ -74,9 +67,7 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> findRoom() {
-        return e -> {
-
-        };
+        return e -> client.joinRoom(new Chat(tfRoomName.getText()));
     }
 
     private EventHandler<ActionEvent> createRoom() {

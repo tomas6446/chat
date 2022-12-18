@@ -29,4 +29,8 @@ public class User implements Serializable {
     public ObservableList<String> getAvailableChat() {
         return FXCollections.observableArrayList(availableChat);
     }
+
+    public void addChat(String name) {
+        availableChat.add(name);
+    }
 }

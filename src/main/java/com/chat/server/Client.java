@@ -71,4 +71,14 @@ public class Client implements Runnable {
     public void createRoom(Chat chat) {
         outputStream.writeObject(new Message(user, chat, MessageType.CREATE_ROOM));
     }
+
+    @SneakyThrows
+    public void joinRoom(Chat chat) {
+        outputStream.writeObject(new Message(user, chat, MessageType.JOIN_ROOM));
+    }
+
+    @SneakyThrows
+    public void auth() {
+        viewHandler.launchLoginWindow();
+    }
 }
