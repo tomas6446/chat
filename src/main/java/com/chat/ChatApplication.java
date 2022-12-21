@@ -1,5 +1,6 @@
 package com.chat;
 
+import com.chat.server.Client;
 import com.chat.view.impl.ViewHandlerImpl;
 import javafx.stage.Stage;
 

@@ -17,6 +17,7 @@ import java.util.List;
  * @author Tomas Kozakas
  */
 public class Handler extends Thread {
+    private List<Client> connections;
     private final Socket socket;
     private final Validate validate = new Validate();
     private ObjectInputStream inputStream;
@@ -41,15 +42,16 @@ public class Handler extends Thread {
                 User user = message.getUser();
                 Chat chat = message.getChat();
                 String msg = message.getMessage();
+
                 switch (message.getMessageType()) {
                     case LOGIN -> {
                         if ((user = validate.login(user)) != null) {
-                            outputStream.writeObject(new Message(user, chat, message.getMessage(), MessageType.CONNECTED));
+                            outputStream.writeObject(new Message(user, chat, MessageType.CONNECTED));
                         }
                     }
                     case JOIN_ROOM -> {
                         if ((user = validate.joinRoom(user, chat)) != null) {
-                            outputStream.writeObject(new Message(user, message.getChat(), MessageType.JOINED_ROOM));
+                            outputStream.writeObject(new Message(user, chat, MessageType.JOINED_ROOM));
                         }
                     }
                     case CREATE_ROOM -> {
@@ -59,7 +61,7 @@ public class Handler extends Thread {
                     }
                     case REGISTER -> {
                         if (validate.register(user)) {
-                            outputStream.writeObject(new Message(user, chat, message.getMessage(), MessageType.CONNECTED));
+                            outputStream.writeObject(new Message(user, chat, MessageType.CONNECTED));
                         }
                     }
                     case SEND -> {

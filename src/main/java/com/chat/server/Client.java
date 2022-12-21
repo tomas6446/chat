@@ -24,7 +24,7 @@ public class Client implements Runnable {
     private Chat chat;
     private ViewHandler viewHandler;
     private Message message;
-
+    private String msg;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
 
@@ -37,7 +37,7 @@ public class Client implements Runnable {
     @Override
     public void run() {
         try {
-            try (Socket socket = new Socket("127.0.0.1", 5000)) {
+            try (Socket socket = new Socket("localhost", 5000)) {
                 outputStream = new ObjectOutputStream(socket.getOutputStream());
                 inputStream = new ObjectInputStream(socket.getInputStream());
                 System.out.println("Connection accepted " + socket.getInetAddress() + ":" + socket.getPort());
@@ -47,6 +47,8 @@ public class Client implements Runnable {
                     System.out.println("Listener: " + message);
                     user = message.getUser();
                     chat = message.getChat();
+                    msg = message.getMessage();
+
                     switch (message.getMessageType()) {
                         case CONNECTED -> main();
                         case JOINED_ROOM -> chat();
@@ -71,12 +73,12 @@ public class Client implements Runnable {
 
     @SneakyThrows
     private void register() {
-        outputStream.writeObject(new Message(user, chat, message.getMessage(), MessageType.REGISTER));
+        outputStream.writeObject(new Message(user, chat, msg, MessageType.REGISTER));
     }
 
     @SneakyThrows
     private void login() {
-        outputStream.writeObject(new Message(user, chat, message.getMessage(), MessageType.LOGIN));
+        outputStream.writeObject(new Message(user, chat, msg, MessageType.LOGIN));
     }
 
     @SneakyThrows
@@ -101,11 +103,11 @@ public class Client implements Runnable {
 
     @SneakyThrows
     public void main() {
-        viewHandler.launchMainWindow(this);
+        viewHandler.launchMainWindow();
     }
 
     @SneakyThrows
     public void chat() {
-        viewHandler.launchChatWindow(this);
+        viewHandler.launchChatWindow();
     }
 }

@@ -12,32 +12,43 @@ import com.chat.window.impl.MainWindow;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 
 /**
  * @author Tomas Kozakas
  */
+@Getter
+@Setter
 public class ViewHandlerImpl implements ViewHandler {
     private final Stage primaryStage;
+    private final LoginController loginController;
+    private final MainController mainController;
+    private final ChatController chatController;
+    private Client client;
 
     public ViewHandlerImpl(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        this.loginController = new LoginController(this);
+        this.mainController = new MainController(this);
+        this.chatController = new ChatController(this);
     }
 
     @Override
     public void launchLoginWindow() {
-        showWindow(new LoginWindow(new LoginController(this)));
+        showWindow(new LoginWindow(loginController));
     }
 
     @Override
-    public void launchMainWindow(Client client) {
-        showWindow(new MainWindow(new MainController(this, client)));
+    public void launchMainWindow() {
+        showWindow(new MainWindow(mainController));
     }
 
     @Override
-    public void launchChatWindow(Client client) {
-        showWindow(new ChatWindow(new ChatController(this, client)));
+    public void launchChatWindow() {
+        showWindow(new ChatWindow(chatController));
     }
 
     private void showWindow(AbstractWindow window) {

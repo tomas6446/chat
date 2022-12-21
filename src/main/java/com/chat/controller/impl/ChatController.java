@@ -21,9 +21,6 @@ import java.util.ResourceBundle;
  * @author Tomas Kozakas
  */
 public class ChatController extends AbstractController {
-    private final User user;
-    private final Chat chat;
-    private final Client client;
     @FXML
     private TableColumn<Chat, String> chatCol;
     @FXML
@@ -37,29 +34,26 @@ public class ChatController extends AbstractController {
     @FXML
     private TextField tfRecipient;
 
-    public ChatController(ViewHandlerImpl viewHandler, Client client) {
-        super(viewHandler, client);
-        this.client = client;
-        this.chat = client.getChat();
-        this.user = client.getUser();
+    public ChatController(ViewHandlerImpl viewHandler) {
+        super(viewHandler);
     }
 
     private EventHandler<ActionEvent> back() {
-        return e -> client.main();
+        return e -> viewHandler.getClient().main();
     }
 
     private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
         return e -> {
             Chat chosenChat = row.getItem();
-            client.joinRoom(chosenChat);
+            viewHandler.getClient().joinRoom(chosenChat);
         };
     }
 
     private EventHandler<KeyEvent> sendMessage() {
         return e -> {
             if (e.getCode() == KeyCode.ENTER) {
-                String msg = user.getName() + ": " + tfInput.getText() + "\n";
-                client.sendMessage(msg);
+                String msg = viewHandler.getClient().getUser().getName() + ": " + tfInput.getText() + "\n";
+                viewHandler.getClient().sendMessage(msg);
                 taOutput.appendText(msg);
                 tfInput.clear();
             }
@@ -69,8 +63,8 @@ public class ChatController extends AbstractController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        chat.getMessages().forEach(msg -> taOutput.appendText(msg));
-        tfRecipient.setText(chat.getName());
+        viewHandler.getClient().getChat().getMessages().forEach(msg -> taOutput.appendText(msg));
+        tfRecipient.setText(viewHandler.getClient().getChat().getName());
         btnBack.setOnAction(back());
 
         tfInput.setOnKeyPressed(sendMessage());
@@ -79,6 +73,6 @@ public class ChatController extends AbstractController {
             row.setOnMouseClicked(chat(row));
             return row;
         });
-        chatTable.setItems(user.getAvailableChat());
+        chatTable.setItems(viewHandler.getClient().getUser().getAvailableChat());
     }
 }

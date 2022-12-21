@@ -10,7 +10,7 @@ import java.io.IOException;
 public interface ViewHandler {
     void launchLoginWindow() throws IOException;
 
-    void launchMainWindow(Client client) throws IOException;
+    void launchMainWindow() throws IOException;
 
-    void launchChatWindow(Client client) throws IOException;
+    void launchChatWindow() throws IOException;
 }

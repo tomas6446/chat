@@ -3,7 +3,6 @@ package com.chat.controller.impl;
 import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
 import com.chat.model.User;
-import com.chat.server.Client;
 import com.chat.view.impl.ViewHandlerImpl;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,8 +18,6 @@ import java.util.ResourceBundle;
  * @author Tomas Kozakas
  */
 public class MainController extends AbstractController {
-    private final User user;
-    private final Client client;
     @FXML
     private TableView<Chat> chatTable;
     @FXML
@@ -42,20 +39,18 @@ public class MainController extends AbstractController {
     @FXML
     private Button btnLogout;
 
-    public MainController(ViewHandlerImpl viewHandler, Client client) {
-        super(viewHandler, client);
-        this.client = client;
-        this.user = client.getUser();
+    public MainController(ViewHandlerImpl viewHandler) {
+        super(viewHandler);
     }
 
     private EventHandler<ActionEvent> logout() {
-        return e -> client.auth();
+        return e -> viewHandler.getClient().auth();
     }
 
     private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
         return e -> {
             Chat chosenChat = row.getItem();
-            client.joinRoom(chosenChat);
+            viewHandler.getClient().joinRoom(chosenChat);
         };
     }
 
@@ -66,17 +61,17 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> findRoom() {
-        return e -> client.joinRoom(new Chat(tfRoomName.getText()));
+        return e -> viewHandler.getClient().joinRoom(new Chat(tfRoomName.getText()));
     }
 
     private EventHandler<ActionEvent> createRoom() {
-        return e -> client.createRoom(new Chat(tfNewRoomName.getText()));
+        return e -> viewHandler.getClient().createRoom(new Chat(tfNewRoomName.getText()));
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        laUsername.setText(user.getName());
+        laUsername.setText(viewHandler.getClient().getUser().getName());
 
         btnLogout.setOnAction(logout());
         btnChatUser.setOnAction(findUser());
@@ -88,6 +83,6 @@ public class MainController extends AbstractController {
             row.setOnMouseClicked(chat(row));
             return row;
         });
-        chatTable.setItems(user.getAvailableChat());
+        chatTable.setItems(viewHandler.getClient().getUser().getAvailableChat());
     }
 }

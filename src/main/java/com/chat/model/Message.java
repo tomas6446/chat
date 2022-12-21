@@ -44,4 +44,12 @@ public class Message implements Serializable {
         this.message = message;
         this.messageType = messageType;
     }
+
+    public Message(Client client, User user, Chat chat, String message, MessageType messageType) {
+        this.client = client;
+        this.user = user;
+        this.chat = chat;
+        this.message = message;
+        this.messageType = messageType;
+    }
 }
