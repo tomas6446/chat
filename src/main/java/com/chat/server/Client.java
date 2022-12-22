@@ -4,7 +4,8 @@ import com.chat.model.Chat;
 import com.chat.model.Message;
 import com.chat.model.MessageType;
 import com.chat.model.User;
-import com.chat.view.ViewHandler;
+import com.chat.view.impl.ViewHandlerImpl;
+import javafx.scene.control.TextArea;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -22,13 +23,14 @@ import java.net.Socket;
 public class Client implements Runnable {
     private User user;
     private Chat chat;
-    private ViewHandler viewHandler;
-    private Message message;
     private String msg;
+    private ViewHandlerImpl viewHandler;
+    private Message message;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
+    private TextArea output;
 
-    public Client(User user, ViewHandler viewHandler, Message message) {
+    public Client(User user, ViewHandlerImpl viewHandler, Message message) {
         this.viewHandler = viewHandler;
         this.user = user;
         this.message = message;
@@ -48,11 +50,12 @@ public class Client implements Runnable {
                     user = message.getUser();
                     chat = message.getChat();
                     msg = message.getMessage();
+                    output = message.getOutput();
 
                     switch (message.getMessageType()) {
                         case CONNECTED -> main();
                         case JOINED_ROOM -> chat();
-                        case RECEIVE -> System.out.println(message);
+                        case RECEIVE -> output.appendText(msg);
                     }
                 }
             }
@@ -73,12 +76,12 @@ public class Client implements Runnable {
 
     @SneakyThrows
     private void register() {
-        outputStream.writeObject(new Message(user, chat, msg, MessageType.REGISTER));
+        outputStream.writeObject(new Message(user, chat, MessageType.REGISTER));
     }
 
     @SneakyThrows
     private void login() {
-        outputStream.writeObject(new Message(user, chat, msg, MessageType.LOGIN));
+        outputStream.writeObject(new Message(user, chat, MessageType.LOGIN));
     }
 
     @SneakyThrows
@@ -93,7 +96,7 @@ public class Client implements Runnable {
 
     @SneakyThrows
     public void sendMessage(String message) {
-        outputStream.writeObject(new Message(user, chat, message, MessageType.SEND));
+        outputStream.writeObject(new Message(user, chat, message, viewHandler.getClient().getOutput(), MessageType.SEND));
     }
 
     @SneakyThrows

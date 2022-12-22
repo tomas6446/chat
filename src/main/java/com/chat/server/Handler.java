@@ -1,9 +1,11 @@
 package com.chat.server;
 
+import com.chat.controller.impl.ChatController;
 import com.chat.model.Chat;
 import com.chat.model.Message;
 import com.chat.model.MessageType;
 import com.chat.model.User;
+import javafx.scene.control.TextArea;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
@@ -17,12 +19,11 @@ import java.util.List;
  * @author Tomas Kozakas
  */
 public class Handler extends Thread {
-    private List<Client> connections;
     private final Socket socket;
     private final Validate validate = new Validate();
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
-    private List<Client> clients = new ArrayList<>();
+    private List<User> clients = new ArrayList<>();
 
     public Handler(Socket socket) {
         this.socket = socket;
@@ -42,11 +43,19 @@ public class Handler extends Thread {
                 User user = message.getUser();
                 Chat chat = message.getChat();
                 String msg = message.getMessage();
+                TextArea output = message.getOutput();
 
                 switch (message.getMessageType()) {
                     case LOGIN -> {
                         if ((user = validate.login(user)) != null) {
                             outputStream.writeObject(new Message(user, chat, MessageType.CONNECTED));
+                            clients.add(user);
+                        }
+                    }
+                    case REGISTER -> {
+                        if (validate.register(user)) {
+                            outputStream.writeObject(new Message(user, chat, MessageType.CONNECTED));
+                            clients.add(user);
                         }
                     }
                     case JOIN_ROOM -> {
@@ -59,14 +68,10 @@ public class Handler extends Thread {
                             outputStream.writeObject(new Message(user, chat, MessageType.JOINED_ROOM));
                         }
                     }
-                    case REGISTER -> {
-                        if (validate.register(user)) {
-                            outputStream.writeObject(new Message(user, chat, MessageType.CONNECTED));
-                        }
-                    }
+
                     case SEND -> {
                         if ((chat = validate.sendToRoom(chat, msg)) != null) {
-                            outputStream.writeObject(new Message(user, chat, msg, MessageType.RECEIVE));
+                            outputStream.writeObject(new Message(user, chat, msg, output, MessageType.RECEIVE));
                         }
                     }
                 }

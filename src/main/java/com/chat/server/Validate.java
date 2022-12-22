@@ -27,6 +27,7 @@ public class Validate {
         if (!database.containsChat(chat.getName())) {
             return null;
         }
+        user.setConnectedChat(chat.getName());
         if (!user.containsChat(chat.getName())) {
             user.addChat(database.getChat(chat.getName()));
             database.replaceUser(user);
@@ -49,9 +50,11 @@ public class Validate {
             return null;
         }
         user.addChat(chat);
+        user.setConnectedChat(chat.getName());
         database.replaceUser(user);
         database.addChat(chat);
         database.exportData();
+
         return user;
     }
 

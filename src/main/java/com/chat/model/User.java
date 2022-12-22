@@ -20,6 +20,7 @@ import java.util.Objects;
 public class User implements Serializable {
     private String name;
     private String password;
+    private String connectedChat;
     private List<Chat> availableChat = new ArrayList<>();
 
     public User(String name, String password) {

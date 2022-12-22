@@ -2,7 +2,6 @@ package com.chat.controller.impl;
 
 import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
-import com.chat.model.User;
 import com.chat.server.Client;
 import com.chat.view.impl.ViewHandlerImpl;
 import javafx.event.ActionEvent;
@@ -13,14 +12,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import lombok.Getter;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
  * @author Tomas Kozakas
  */
+@Getter
 public class ChatController extends AbstractController {
+    private Client client;
     @FXML
     private TableColumn<Chat, String> chatCol;
     @FXML
@@ -36,6 +39,7 @@ public class ChatController extends AbstractController {
 
     public ChatController(ViewHandlerImpl viewHandler) {
         super(viewHandler);
+        client = viewHandler.getClient();
     }
 
     private EventHandler<ActionEvent> back() {
@@ -54,7 +58,6 @@ public class ChatController extends AbstractController {
             if (e.getCode() == KeyCode.ENTER) {
                 String msg = viewHandler.getClient().getUser().getName() + ": " + tfInput.getText() + "\n";
                 viewHandler.getClient().sendMessage(msg);
-                taOutput.appendText(msg);
                 tfInput.clear();
             }
         };

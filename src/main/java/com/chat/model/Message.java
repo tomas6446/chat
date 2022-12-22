@@ -1,6 +1,6 @@
 package com.chat.model;
 
-import com.chat.server.Client;
+import javafx.scene.control.TextArea;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,16 +16,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 public class Message implements Serializable {
-    private Client client;
     private String message;
     private User user;
     private Chat chat;
+    private TextArea output;
     private MessageType messageType;
-
-    public Message(Client client, MessageType messageType) {
-        this.client = client;
-        this.messageType = messageType;
-    }
 
     public Message(User user, MessageType messageType) {
         this.user = user;
@@ -45,11 +40,11 @@ public class Message implements Serializable {
         this.messageType = messageType;
     }
 
-    public Message(Client client, User user, Chat chat, String message, MessageType messageType) {
-        this.client = client;
+    public Message(User user, Chat chat, String message, TextArea output, MessageType messageType) {
         this.user = user;
         this.chat = chat;
         this.message = message;
+        this.output = output;
         this.messageType = messageType;
     }
 }
