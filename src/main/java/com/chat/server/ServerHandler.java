@@ -12,7 +12,6 @@ import java.util.List;
 @Getter
 public class ServerHandler extends Thread {
     private final List<ServerThread> serverThreads = new ArrayList<>();
-    private final DatabaseHolder databaseHolder = new DatabaseHolder();
 
     public void addSocket(Socket socket) {
         ServerThread serverThread = new ServerThread(socket, this);

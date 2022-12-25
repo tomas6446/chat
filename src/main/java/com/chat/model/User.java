@@ -1,7 +1,5 @@
 package com.chat.model;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +8,6 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Tomas Kozakas
@@ -29,7 +26,19 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public ObservableList<Chat> getAvailableChat() {
-        return FXCollections.observableArrayList(availableChat);
+    public boolean containsChat(String chatName) {
+        return availableChat.stream().anyMatch(chat -> chat.getName().equals(chatName));
+    }
+
+    public Chat getChat(String chatName) {
+        return availableChat.stream().filter(chat -> chat.getName().equals(chatName)).findFirst().orElse(null);
+    }
+
+    public void sendMsg(String chatName, String msg) {
+        availableChat.forEach(chat -> {
+            if (chat != null && chat.getName().equals(chatName)) {
+                chat.getMessages().add(msg);
+            }
+        });
     }
 }

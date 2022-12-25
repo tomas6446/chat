@@ -23,32 +23,40 @@ import java.io.IOException;
 @Getter
 @Setter
 public class ViewHandlerImpl implements ViewHandler {
+    private Client client;
     private final Stage primaryStage;
     private final LoginController loginController;
     private final MainController mainController;
     private final ChatController chatController;
-    private Client client;
+
+    private MainWindow mainWindow;
+    private LoginWindow loginWindow;
+    private ChatWindow chatWindow;
 
     public ViewHandlerImpl(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.loginController = new LoginController(this);
         this.mainController = new MainController(this);
         this.chatController = new ChatController(this);
+
+        this.loginWindow = new LoginWindow(loginController);
+        this.mainWindow = new MainWindow(mainController);
+        this.chatWindow = new ChatWindow(chatController);
     }
 
     @Override
     public void launchLoginWindow() {
-        showWindow(new LoginWindow(loginController));
+        showWindow(loginWindow);
     }
 
     @Override
     public void launchMainWindow() {
-        showWindow(new MainWindow(mainController));
+        showWindow(mainWindow);
     }
 
     @Override
     public void launchChatWindow() {
-        showWindow(new ChatWindow(chatController));
+        showWindow(chatWindow);
     }
 
     private void showWindow(AbstractWindow window) {

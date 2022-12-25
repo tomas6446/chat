@@ -1,9 +1,6 @@
 package com.chat.server;
 
-import com.chat.model.Chat;
-import com.chat.model.Message;
-import com.chat.model.MessageType;
-import com.chat.model.User;
+import com.chat.model.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -23,7 +20,7 @@ public class ServerThread extends Thread {
 
     private final Socket socket;
     private final ServerHandler serverHandler;
-    private final DatabaseHolder databaseHolder = new DatabaseHolder();
+    private final Database database = new Database();
 
     private User loggedInUser;
 
@@ -45,17 +42,11 @@ public class ServerThread extends Thread {
                 System.out.println("Handler: " + message.toString().replace("\n", ""));
 
                 switch (message.getMessageType()) {
-                    case LOGIN -> {
-                        loggedInUser = databaseHolder.login(message.getUser());
-                        writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, MessageType.CONNECTED));
-                    }
-                    case REGISTER -> {
-                        loggedInUser = databaseHolder.register(message.getUser());
-                        writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, MessageType.CONNECTED));
-                    }
-                    case JOIN_ROOM -> joinRoom(outputStream, message);
-                    case CREATE_ROOM -> createRoom(outputStream, message);
-                    case SEND -> sendAll(message);
+                    case LOGIN -> login(message);
+                    case REGISTER -> register(message);
+                    case JOIN_ROOM -> joinRoom(message);
+                    case CREATE_ROOM -> createRoom(message);
+                    case SEND -> send(message);
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -66,21 +57,63 @@ public class ServerThread extends Thread {
         }
     }
 
-    private static void writeMessage(boolean send, ObjectOutputStream outputStream, Message message) throws IOException {
-        if (send) {
-            outputStream.writeObject(message);
+    private void send(Message message) throws IOException {
+        String chatName = message.getChatName();
+        String msg = message.getMsg();
+
+        for (ServerThread serverThread : serverHandler.getServerThreads()) {
+            ObjectOutputStream out = serverThread.getOutputStream();
+            User user = serverThread.getLoggedInUser();
+            user.sendMsg(chatName, msg);
+            database.replaceUser(user);
+            database.exportData();
+            out.writeObject(new Message(user, chatName, msg, MessageType.RECEIVE));
         }
     }
 
-    private void joinRoom(ObjectOutputStream outputStream, Message message) throws IOException {
-
+    private void createRoom(Message message) throws IOException {
+        String chatName = message.getChatName();
+        if (database.getChat(chatName) == null) {
+            database.getChatList().add(chatName);
+            loggedInUser.getAvailableChat().add(new Chat(chatName));
+            database.replaceUser(loggedInUser);
+            database.exportData();
+            outputStream.writeObject(new Message(loggedInUser, chatName, MessageType.JOINED_ROOM));
+        }
     }
 
-    private void createRoom(ObjectOutputStream outputStream, Message message) throws IOException {
+    private void joinRoom(Message message) throws IOException {
+        String chatName = message.getChatName();
+        Chat chat;
 
+        if ((chat = database.getChat(chatName)) != null) {
+            if (!loggedInUser.containsChat(chatName)) {
+                loggedInUser.getAvailableChat().add(chat);
+                database.replaceUser(loggedInUser);
+                database.exportData();
+            }
+            outputStream.writeObject(new Message(loggedInUser, chatName, MessageType.JOINED_ROOM));
+        }
     }
 
-    private void sendAll(Message message) throws IOException {
+    private void login(Message message) throws IOException {
+        User user = message.getUser();
+        if (database.containsUser(user.getName())) {
+            User foundUser = database.getUser(user.getName());
+            if (user.getPassword().equals(foundUser.getPassword())) {
+                loggedInUser = foundUser;
+                outputStream.writeObject(new Message(loggedInUser, MessageType.CONNECTED));
+            }
+        }
+    }
 
+    private void register(Message message) throws IOException {
+        User user = message.getUser();
+        if (!database.containsUser(user.getName())) {
+            loggedInUser = user;
+            database.getUserMap().put(user.getName(), user);
+            database.exportData();
+            outputStream.writeObject(new Message(loggedInUser, MessageType.CONNECTED));
+        }
     }
 }

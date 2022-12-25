@@ -62,5 +62,15 @@ public class Database {
         return userMap.get(username);
     }
 
+    public Chat getChat(String chatName) {
+        return userMap.values()
+                .stream()
+                .flatMap(user -> user.getAvailableChat().stream())
+                .filter(chat -> chat.getName().equals(chatName))
+                .findFirst().orElse(null);
+    }
 
+    public void replaceUser(User user) {
+        userMap.replace(user.getName(), user);
+    }
 }

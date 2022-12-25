@@ -2,8 +2,10 @@ package com.chat.controller.impl;
 
 import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
+import com.chat.model.User;
 import com.chat.server.Client;
 import com.chat.view.impl.ViewHandlerImpl;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -14,7 +16,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -47,8 +48,8 @@ public class ChatController extends AbstractController {
     private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
         return e -> {
             Chat chosenChat = row.getItem();
-            if(chosenChat != null) {
-                viewHandler.getClient().joinRoom(chosenChat);
+            if (chosenChat != null) {
+                viewHandler.getClient().joinRoom(chosenChat.getName());
             }
         };
     }
@@ -66,10 +67,15 @@ public class ChatController extends AbstractController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+
         Client client = viewHandler.getClient();
-        Chat chat = client.getChat();
-        chat.getMessages().forEach(msg -> taOutput.appendText(msg));
-        tfRecipient.setText(chat.getName());
+        User user = client.getUser();
+        Chat chat = user.getChat(client.getChatName());
+        if (chat != null) {
+            chat.getMessages().forEach(msg -> taOutput.appendText(msg));
+        }
+
+        tfRecipient.setText(client.getChatName());
         btnBack.setOnAction(back());
 
         tfInput.setOnKeyPressed(sendMessage());
@@ -78,6 +84,6 @@ public class ChatController extends AbstractController {
             row.setOnMouseClicked(chat(row));
             return row;
         });
-        chatTable.setItems(client.getUser().getAvailableChat());
+        chatTable.setItems(FXCollections.observableArrayList(user.getAvailableChat()));
     }
 }

@@ -1,11 +1,9 @@
 package com.chat.server;
 
-import com.chat.model.Chat;
 import com.chat.model.Message;
 import com.chat.model.MessageType;
 import com.chat.model.User;
 import com.chat.view.impl.ViewHandlerImpl;
-import javafx.scene.control.TextArea;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -22,13 +20,13 @@ import java.net.Socket;
 @Getter
 public class Client implements Runnable {
     private User user;
-    private Chat chat;
+    private String chatName;
     private String msg;
-    private ViewHandlerImpl viewHandler;
     private Message message;
+
+    private ViewHandlerImpl viewHandler;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
-    private TextArea output;
 
     public Client(User user, ViewHandlerImpl viewHandler, Message message) {
         this.viewHandler = viewHandler;
@@ -48,7 +46,7 @@ public class Client implements Runnable {
                 while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
                     System.out.println("Listener: " + message.toString().replace("\n", ""));
                     user = message.getUser();
-                    chat = message.getChat();
+                    chatName = message.getChatName();
                     msg = message.getMsg();
 
                     switch (message.getMessageType()) {
@@ -88,18 +86,18 @@ public class Client implements Runnable {
     }
 
     @SneakyThrows
-    public void joinRoom(Chat chat) {
-
+    public void joinRoom(String chat) {
+        outputStream.writeObject(new Message(chat, MessageType.JOIN_ROOM));
     }
 
     @SneakyThrows
-    public void createRoom(Chat chat) {
-
+    public void createRoom(String chat) {
+        outputStream.writeObject(new Message(chat, MessageType.CREATE_ROOM));
     }
 
     @SneakyThrows
-    public void sendMessage(String message) {
-
+    public void sendMessage(String msg) {
+        outputStream.writeObject(new Message(chatName, msg, MessageType.SEND));
     }
 
     @SneakyThrows

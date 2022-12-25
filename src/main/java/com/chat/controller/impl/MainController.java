@@ -2,7 +2,10 @@ package com.chat.controller.impl;
 
 import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
+import com.chat.model.User;
+import com.chat.server.Client;
 import com.chat.view.impl.ViewHandlerImpl;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -50,7 +53,7 @@ public class MainController extends AbstractController {
         return e -> {
             Chat chosenChat = row.getItem();
             if (chosenChat != null) {
-                viewHandler.getClient().joinRoom(chosenChat);
+                viewHandler.getClient().joinRoom(chosenChat.getName());
             }
         };
     }
@@ -62,18 +65,21 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> findRoom() {
-        return e -> viewHandler.getClient().joinRoom(new Chat(tfRoomName.getText()));
+        return e -> viewHandler.getClient().joinRoom(tfRoomName.getText());
     }
 
     private EventHandler<ActionEvent> createRoom() {
-        return e -> viewHandler.getClient().createRoom(new Chat(tfNewRoomName.getText()));
+        return e -> viewHandler.getClient().createRoom(tfNewRoomName.getText());
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        laUsername.setText(viewHandler.getClient().getUser().getName());
 
+        Client client = viewHandler.getClient();
+        User user = client.getUser();
+
+        laUsername.setText(user.getName());
         btnLogout.setOnAction(logout());
         btnChatUser.setOnAction(findUser());
         btnChatRoom.setOnAction(findRoom());
@@ -84,6 +90,6 @@ public class MainController extends AbstractController {
             row.setOnMouseClicked(chat(row));
             return row;
         });
-        chatTable.setItems(viewHandler.getClient().getUser().getAvailableChat());
+        chatTable.setItems(FXCollections.observableArrayList(user.getAvailableChat()));
     }
 }
