@@ -50,7 +50,8 @@ public class ServerThread extends Thread {
                         writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, MessageType.CONNECTED));
                     }
                     case REGISTER -> {
-                        writeMessage(databaseHolder.register(user), outputStream, new Message(user, MessageType.CONNECTED));
+                        loggedInUser = databaseHolder.register(user);
+                        writeMessage(databaseHolder.register(user), outputStream, new Message(loggedInUser, MessageType.CONNECTED));
                     }
                     case JOIN_ROOM -> joinRoom(outputStream, message, loggedInUser);
                     case CREATE_ROOM -> createRoom(outputStream, message, loggedInUser);

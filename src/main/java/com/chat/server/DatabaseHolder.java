@@ -36,13 +36,13 @@ public class DatabaseHolder {
         return user;
     }
 
-    public boolean register(User user) {
+    public User register(User user) {
         if (database.containsChat(user.getName())) {
-            return false;
+            return null;
         }
         database.addUser(user);
         database.exportData();
-        return true;
+        return user;
     }
 
     public User createRoom(User user, Chat chat) {
