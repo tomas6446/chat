@@ -89,17 +89,17 @@ public class Client implements Runnable {
 
     @SneakyThrows
     public void joinRoom(Chat chat) {
-        outputStream.writeObject(new Message(user, chat, MessageType.JOIN_ROOM));
+
     }
 
     @SneakyThrows
     public void createRoom(Chat chat) {
-        outputStream.writeObject(new Message(user, chat, MessageType.CREATE_ROOM));
+
     }
 
     @SneakyThrows
     public void sendMessage(String message) {
-        outputStream.writeObject(new Message(user, chat, message, MessageType.SEND));
+
     }
 
     @SneakyThrows

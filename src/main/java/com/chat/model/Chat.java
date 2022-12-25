@@ -23,8 +23,4 @@ public class Chat implements Serializable {
     public Chat(String name) {
         this.name = name;
     }
-
-    public void addMessage(String message) {
-        messages.add(message);
-    }
 }

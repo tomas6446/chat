@@ -43,14 +43,14 @@ public class ServerThread extends Thread {
             Message message;
             while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
                 System.out.println("Handler: " + message.toString().replace("\n", ""));
-                User user = message.getUser();
+
                 switch (message.getMessageType()) {
                     case LOGIN -> {
-                        loggedInUser = databaseHolder.login(user);
+                        loggedInUser = databaseHolder.login(message.getUser());
                         writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, MessageType.CONNECTED));
                     }
                     case REGISTER -> {
-                        loggedInUser = databaseHolder.register(user);
+                        loggedInUser = databaseHolder.register(message.getUser());
                         writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, MessageType.CONNECTED));
                     }
                     case JOIN_ROOM -> joinRoom(outputStream, message);
@@ -73,25 +73,14 @@ public class ServerThread extends Thread {
     }
 
     private void joinRoom(ObjectOutputStream outputStream, Message message) throws IOException {
-        Chat chat = message.getChat();
-        loggedInUser = databaseHolder.joinRoom(loggedInUser, chat);
-        writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, chat, MessageType.JOINED_ROOM));
+
     }
 
     private void createRoom(ObjectOutputStream outputStream, Message message) throws IOException {
-        Chat chat = message.getChat();
-        loggedInUser = databaseHolder.createRoom(loggedInUser, chat);
-        writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, chat, MessageType.JOINED_ROOM));
+
     }
 
     private void sendAll(Message message) throws IOException {
-        String msg = message.getMsg();
-        Chat chat = message.getChat();
 
-        for (ServerThread serverThread : serverHandler.getServerThreads()) {
-            ObjectOutputStream outputStream1 = serverThread.getOutputStream();
-            chat = databaseHolder.sendToRoom(chat, msg);
-            writeMessage(chat != null, outputStream1, new Message(serverThread.getLoggedInUser(), chat, msg, MessageType.RECEIVE));
-        }
     }
 }

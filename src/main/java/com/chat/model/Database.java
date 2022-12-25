@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class Database {
-    private Map<String, Chat> chatMap = new HashMap<>();
+    private List<String> chatList = new ArrayList<>();
     private Map<String, User> userMap = new HashMap<>();
 
     public Database() {
@@ -33,9 +34,8 @@ public class Database {
             });
             userMap = userList.stream().collect(Collectors.toMap(User::getName, Function.identity()));
 
-            List<Chat> chatList = new ObjectMapper().readValue(new File("data/chat.json"), new TypeReference<>() {
+            chatList = new ObjectMapper().readValue(new File("data/chat.json"), new TypeReference<>() {
             });
-            chatMap = chatList.stream().collect(Collectors.toMap(Chat::getName, Function.identity()));
         } catch (IOException e) {
             System.err.println("Unable to import data");
             e.printStackTrace();
@@ -47,11 +47,10 @@ public class Database {
             List<User> userList = userMap.values().stream().toList();
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(new FileWriter("data/user.json"), userList);
-
-            List<Chat> chatList = chatMap.values().stream().toList();
             objectMapper.writeValue(new FileWriter("data/chat.json"), chatList);
         } catch (IOException e) {
             System.err.println("Unable to export data");
+            e.printStackTrace();
         }
     }
 
@@ -59,31 +58,9 @@ public class Database {
         return userMap.containsKey(username);
     }
 
-    public boolean containsChat(String chatName) {
-        return chatMap.containsKey(chatName);
-    }
-
     public User getUser(String username) {
         return userMap.get(username);
     }
 
-    public Chat getChat(String chatName) {
-        return chatMap.get(chatName);
-    }
 
-    public void addChat(Chat chat) {
-        chatMap.put(chat.getName(), chat);
-    }
-
-    public void addUser(User user) {
-        userMap.put(user.getName(), user);
-    }
-
-    public void replaceUser(User user) {
-        userMap.replace(user.getName(), user);
-    }
-
-    public void replaceChat(Chat chat) {
-        chatMap.replace(chat.getName(), chat);
-    }
 }

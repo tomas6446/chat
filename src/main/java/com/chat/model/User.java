@@ -22,7 +22,6 @@ import java.util.Objects;
 public class User implements Serializable {
     private String name;
     private String password;
-    private String connectedChat;
     private List<Chat> availableChat = new ArrayList<>();
 
     public User(String name, String password) {
@@ -32,13 +31,5 @@ public class User implements Serializable {
 
     public ObservableList<Chat> getAvailableChat() {
         return FXCollections.observableArrayList(availableChat);
-    }
-
-    public void addChat(Chat newChat) {
-        availableChat.add(newChat);
-    }
-
-    public boolean containsChat(String name) {
-        return availableChat.stream().anyMatch(chat -> Objects.equals(chat.getName(), name));
     }
 }
