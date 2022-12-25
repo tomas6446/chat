@@ -23,7 +23,6 @@ import java.util.ResourceBundle;
  */
 @Getter
 public class ChatController extends AbstractController {
-    private Client client;
     @FXML
     private TableColumn<Chat, String> chatCol;
     @FXML
@@ -39,7 +38,6 @@ public class ChatController extends AbstractController {
 
     public ChatController(ViewHandlerImpl viewHandler) {
         super(viewHandler);
-        client = viewHandler.getClient();
     }
 
     private EventHandler<ActionEvent> back() {
@@ -49,7 +47,9 @@ public class ChatController extends AbstractController {
     private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
         return e -> {
             Chat chosenChat = row.getItem();
-            viewHandler.getClient().joinRoom(chosenChat);
+            if(chosenChat != null) {
+                viewHandler.getClient().joinRoom(chosenChat);
+            }
         };
     }
 
@@ -66,8 +66,10 @@ public class ChatController extends AbstractController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         chatCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        viewHandler.getClient().getChat().getMessages().forEach(msg -> taOutput.appendText(msg));
-        tfRecipient.setText(viewHandler.getClient().getChat().getName());
+        Client client = viewHandler.getClient();
+        Chat chat = client.getChat();
+        chat.getMessages().forEach(msg -> taOutput.appendText(msg));
+        tfRecipient.setText(chat.getName());
         btnBack.setOnAction(back());
 
         tfInput.setOnKeyPressed(sendMessage());
@@ -76,6 +78,6 @@ public class ChatController extends AbstractController {
             row.setOnMouseClicked(chat(row));
             return row;
         });
-        chatTable.setItems(viewHandler.getClient().getUser().getAvailableChat());
+        chatTable.setItems(client.getUser().getAvailableChat());
     }
 }

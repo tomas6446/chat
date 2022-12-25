@@ -12,23 +12,20 @@ import java.net.Socket;
  */
 @Getter
 public class Server implements Runnable {
-    private ServerSocket serverSocket;
 
     @SneakyThrows
     @Override
     public void run() {
-        try {
-            serverSocket = new ServerSocket(5000);
+        try (ServerSocket serverSocket = new ServerSocket(5000)){
             System.out.println("Server starting...\nWaiting for clients");
-
+            ServerHandler serverHandler = new ServerHandler();
+            serverHandler.start();
             while (true) {
                 Socket socket = serverSocket.accept();
-                new Handler(socket).start();
+                serverHandler.addSocket(socket);
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
-        } finally {
-            serverSocket.close();
         }
     }
 }

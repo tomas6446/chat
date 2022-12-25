@@ -79,19 +79,11 @@ public class Database {
         userMap.put(user.getName(), user);
     }
 
-    public void updateUser(User user) {
-        userMap.replace(user.getName(), user);
-    }
-
-    public void updateChat(Chat chat) {
-        chatMap.replace(chat.getName(), chat);
-    }
-
-    public List<String> getChatMessages(String name) {
-        return chatMap.get(name).getMessages();
-    }
-
     public void replaceUser(User user) {
         userMap.replace(user.getName(), user);
+    }
+
+    public void replaceChat(Chat chat) {
+        chatMap.replace(chat.getName(), chat);
     }
 }

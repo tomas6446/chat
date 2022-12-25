@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class User implements Serializable {
     private String name;
     private String password;
@@ -37,11 +39,6 @@ public class User implements Serializable {
     }
 
     public boolean containsChat(String name) {
-        for (Chat chat : availableChat) {
-            if (Objects.equals(chat.getName(), name)) {
-                return true;
-            }
-        }
-        return false;
+        return availableChat.stream().anyMatch(chat -> Objects.equals(chat.getName(), name));
     }
 }

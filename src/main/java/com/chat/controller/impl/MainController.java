@@ -2,7 +2,6 @@ package com.chat.controller.impl;
 
 import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
-import com.chat.model.User;
 import com.chat.view.impl.ViewHandlerImpl;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -50,7 +49,9 @@ public class MainController extends AbstractController {
     private EventHandler<MouseEvent> chat(TableRow<Chat> row) {
         return e -> {
             Chat chosenChat = row.getItem();
-            viewHandler.getClient().joinRoom(chosenChat);
+            if (chosenChat != null) {
+                viewHandler.getClient().joinRoom(chosenChat);
+            }
         };
     }
 

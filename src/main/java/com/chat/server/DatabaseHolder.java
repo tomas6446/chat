@@ -9,10 +9,10 @@ import java.util.Objects;
 /**
  * @author Tomas Kozakas
  */
-public class Validate {
+public class DatabaseHolder {
     private final Database database = new Database();
 
-    public Validate() {
+    public DatabaseHolder() {
         database.importData();
     }
 
@@ -62,13 +62,14 @@ public class Validate {
         if (!database.containsChat(chat.getName())) {
             return null;
         }
-        chat.addMessage(message);
-        // Each user that has this chat in the list gets a message
-        database.getUserMap().forEach((s, user) -> user.getAvailableChat().forEach(c -> {
-            if (Objects.equals(c.getName(), chat.getName())) {
-                c.getMessages().add(message);
-            }
-        }));
+//        // Each user that has this chat in the list gets a message
+//        database.getUserMap().forEach((s, user) -> user.getAvailableChat().forEach(c -> {
+//            if (Objects.equals(c.getName(), chat.getName())) {
+//                c.getMessages().add(message);
+//                database.replaceUser(user);
+//                database.replaceChat(chat);
+//            }
+//        }));
         database.exportData();
         return chat;
     }

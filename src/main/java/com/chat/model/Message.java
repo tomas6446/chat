@@ -1,5 +1,7 @@
 package com.chat.model;
 
+import com.chat.server.Client;
+import com.chat.view.impl.ViewHandlerImpl;
 import javafx.scene.control.TextArea;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +18,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 public class Message implements Serializable {
+    private ViewHandlerImpl viewHandler;
     private String message;
     private User user;
     private Chat chat;
@@ -45,6 +48,12 @@ public class Message implements Serializable {
         this.chat = chat;
         this.message = message;
         this.output = output;
+        this.messageType = messageType;
+    }
+
+    public Message(User user, ViewHandlerImpl viewHandler, MessageType messageType) {
+        this.user = user;
+        this.viewHandler = viewHandler;
         this.messageType = messageType;
     }
 }

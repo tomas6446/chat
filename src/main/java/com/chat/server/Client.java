@@ -50,12 +50,11 @@ public class Client implements Runnable {
                     user = message.getUser();
                     chat = message.getChat();
                     msg = message.getMessage();
-                    output = message.getOutput();
 
                     switch (message.getMessageType()) {
                         case CONNECTED -> main();
                         case JOINED_ROOM -> chat();
-                        case RECEIVE -> output.appendText(msg);
+                        case RECEIVE -> receive();
                     }
                 }
             }
@@ -67,6 +66,10 @@ public class Client implements Runnable {
         }
     }
 
+    private void receive() {
+        viewHandler.getChatController().getTaOutput().appendText(msg);
+    }
+
     private void connect() {
         switch (message.getMessageType()) {
             case LOGIN -> login();
@@ -76,12 +79,12 @@ public class Client implements Runnable {
 
     @SneakyThrows
     private void register() {
-        outputStream.writeObject(new Message(user, chat, MessageType.REGISTER));
+        outputStream.writeObject(new Message(user, MessageType.REGISTER));
     }
 
     @SneakyThrows
     private void login() {
-        outputStream.writeObject(new Message(user, chat, MessageType.LOGIN));
+        outputStream.writeObject(new Message(user, MessageType.LOGIN));
     }
 
     @SneakyThrows
@@ -96,7 +99,7 @@ public class Client implements Runnable {
 
     @SneakyThrows
     public void sendMessage(String message) {
-        outputStream.writeObject(new Message(user, chat, message, viewHandler.getClient().getOutput(), MessageType.SEND));
+        outputStream.writeObject(new Message(user, chat, message, MessageType.SEND));
     }
 
     @SneakyThrows

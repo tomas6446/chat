@@ -1,10 +1,7 @@
 package com.chat;
 
-import com.chat.server.Client;
 import com.chat.view.impl.ViewHandlerImpl;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 /**
  * @author Tomas Kozakas
@@ -16,7 +13,7 @@ public class ChatApplication extends javafx.application.Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) {
         new ViewHandlerImpl(primaryStage).launchLoginWindow();
     }
 }

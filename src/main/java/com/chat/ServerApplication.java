@@ -1,4 +1,6 @@
-package com.chat.server;
+package com.chat;
+
+import com.chat.server.Server;
 
 /**
  * @author Tomas Kozakas
