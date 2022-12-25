@@ -46,10 +46,10 @@ public class Client implements Runnable {
                 connect();
 
                 while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
-                    System.out.println("Listener: " + message);
+                    System.out.println("Listener: " + message.toString().replace("\n", ""));
                     user = message.getUser();
                     chat = message.getChat();
-                    msg = message.getMessage();
+                    msg = message.getMsg();
 
                     switch (message.getMessageType()) {
                         case CONNECTED -> main();

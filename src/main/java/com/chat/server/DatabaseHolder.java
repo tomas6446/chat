@@ -4,8 +4,6 @@ import com.chat.model.Chat;
 import com.chat.model.Database;
 import com.chat.model.User;
 
-import java.util.Objects;
-
 /**
  * @author Tomas Kozakas
  */
@@ -59,17 +57,8 @@ public class DatabaseHolder {
     }
 
     public Chat sendToRoom(Chat chat, String message) {
-        if (!database.containsChat(chat.getName())) {
-            return null;
-        }
-//        // Each user that has this chat in the list gets a message
-//        database.getUserMap().forEach((s, user) -> user.getAvailableChat().forEach(c -> {
-//            if (Objects.equals(c.getName(), chat.getName())) {
-//                c.getMessages().add(message);
-//                database.replaceUser(user);
-//                database.replaceChat(chat);
-//            }
-//        }));
+        chat.getMessages().add(message);
+        database.replaceChat(chat);
         database.exportData();
         return chat;
     }

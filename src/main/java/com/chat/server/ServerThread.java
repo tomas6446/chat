@@ -42,7 +42,7 @@ public class ServerThread extends Thread {
 
             Message message;
             while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
-                System.out.println("Handler: " + message);
+                System.out.println("Handler: " + message.toString().replace("\n", ""));
                 User user = message.getUser();
                 switch (message.getMessageType()) {
                     case LOGIN -> {
@@ -51,10 +51,10 @@ public class ServerThread extends Thread {
                     }
                     case REGISTER -> {
                         loggedInUser = databaseHolder.register(user);
-                        writeMessage(databaseHolder.register(user), outputStream, new Message(loggedInUser, MessageType.CONNECTED));
+                        writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, MessageType.CONNECTED));
                     }
-                    case JOIN_ROOM -> joinRoom(outputStream, message, loggedInUser);
-                    case CREATE_ROOM -> createRoom(outputStream, message, loggedInUser);
+                    case JOIN_ROOM -> joinRoom(outputStream, message);
+                    case CREATE_ROOM -> createRoom(outputStream, message);
                     case SEND -> sendAll(message);
                 }
             }
@@ -66,26 +66,26 @@ public class ServerThread extends Thread {
         }
     }
 
-    private static void writeMessage(boolean send, ObjectOutputStream outputStream, Message user1) throws IOException {
+    private static void writeMessage(boolean send, ObjectOutputStream outputStream, Message message) throws IOException {
         if (send) {
-            outputStream.writeObject(user1);
+            outputStream.writeObject(message);
         }
     }
 
-    private void joinRoom(ObjectOutputStream outputStream, Message message, User user) throws IOException {
+    private void joinRoom(ObjectOutputStream outputStream, Message message) throws IOException {
         Chat chat = message.getChat();
-        user = databaseHolder.joinRoom(user, chat);
-        writeMessage(user != null, outputStream, new Message(user, chat, MessageType.JOINED_ROOM));
+        loggedInUser = databaseHolder.joinRoom(loggedInUser, chat);
+        writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, chat, MessageType.JOINED_ROOM));
     }
 
-    private void createRoom(ObjectOutputStream outputStream, Message message, User user) throws IOException {
+    private void createRoom(ObjectOutputStream outputStream, Message message) throws IOException {
         Chat chat = message.getChat();
-        user = databaseHolder.createRoom(user, chat);
-        writeMessage(user != null, outputStream, new Message(user, chat, MessageType.JOINED_ROOM));
+        loggedInUser = databaseHolder.createRoom(loggedInUser, chat);
+        writeMessage(loggedInUser != null, outputStream, new Message(loggedInUser, chat, MessageType.JOINED_ROOM));
     }
 
     private void sendAll(Message message) throws IOException {
-        String msg = message.getMessage();
+        String msg = message.getMsg();
         Chat chat = message.getChat();
 
         for (ServerThread serverThread : serverHandler.getServerThreads()) {
