@@ -19,6 +19,8 @@ import java.util.List;
 public class Chat implements Serializable {
     private List<String> messages = new ArrayList<>();
     private String name;
+    boolean privateRoom;
+    int userCount;
 
     public Chat(String name) {
         this.name = name;

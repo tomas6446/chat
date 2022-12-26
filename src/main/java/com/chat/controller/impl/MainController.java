@@ -27,15 +27,11 @@ public class MainController extends AbstractController {
     @FXML
     private Label laUsername;
     @FXML
-    private TextField tfRecipient;
-    @FXML
     private TextField tfNewRoomName;
     @FXML
     private TextField tfRoomName;
     @FXML
     private Button btnChatRoom;
-    @FXML
-    private Button btnChatUser;
     @FXML
     private Button btnCreateRoom;
     @FXML
@@ -58,12 +54,6 @@ public class MainController extends AbstractController {
         };
     }
 
-    private EventHandler<ActionEvent> findUser() {
-        return e -> {
-
-        };
-    }
-
     private EventHandler<ActionEvent> findRoom() {
         return e -> viewHandler.getClient().joinRoom(tfRoomName.getText());
     }
@@ -81,7 +71,6 @@ public class MainController extends AbstractController {
 
         laUsername.setText(user.getName());
         btnLogout.setOnAction(logout());
-        btnChatUser.setOnAction(findUser());
         btnChatRoom.setOnAction(findRoom());
         btnCreateRoom.setOnAction(createRoom());
 

@@ -57,6 +57,7 @@ public class ServerThread extends Thread {
         }
     }
 
+
     private void send(Message message) throws IOException {
         String chatName = message.getChatName();
         String msg = message.getMsg();
@@ -64,7 +65,7 @@ public class ServerThread extends Thread {
         for (ServerThread serverThread : serverHandler.getServerThreads()) {
             ObjectOutputStream out = serverThread.getOutputStream();
             User user = serverThread.getLoggedInUser();
-            if(user != null) {
+            if (user != null) {
                 user.sendMsg(chatName, msg);
                 database.replaceUser(user);
                 database.exportData();

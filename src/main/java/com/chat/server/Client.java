@@ -66,7 +66,8 @@ public class Client implements Runnable {
     }
 
     private void receive() {
-        if(chatName.equals(msgReceivedChat)) {
+        if (chatName.equals(msgReceivedChat)) {
+            user.sendMsg(chatName, msg);
             viewHandler.getChatController().getTaOutput().appendText(msg);
         }
     }
