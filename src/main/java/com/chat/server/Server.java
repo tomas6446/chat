@@ -19,7 +19,6 @@ public class Server implements Runnable {
         try (ServerSocket serverSocket = new ServerSocket(5000)){
             System.out.println("Server starting...\nWaiting for clients");
             ServerHandler serverHandler = new ServerHandler();
-            serverHandler.start();
             while (true) {
                 Socket socket = serverSocket.accept();
                 serverHandler.addSocket(socket);

@@ -3,7 +3,7 @@ package com.chat.server;
 import com.chat.model.Message;
 import com.chat.model.MessageType;
 import com.chat.model.User;
-import com.chat.view.impl.ViewHandlerImpl;
+import com.chat.view.ViewHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -25,11 +25,11 @@ public class Client implements Runnable {
     private String msg;
     private Message message;
 
-    private ViewHandlerImpl viewHandler;
+    private ViewHandler viewHandler;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
 
-    public Client(User user, ViewHandlerImpl viewHandler, Message message) {
+    public Client(User user, ViewHandler viewHandler, Message message) {
         this.viewHandler = viewHandler;
         this.user = user;
         this.message = message;
@@ -37,24 +37,22 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
-        try {
-            try (Socket socket = new Socket("localhost", 5000)) {
-                outputStream = new ObjectOutputStream(socket.getOutputStream());
-                inputStream = new ObjectInputStream(socket.getInputStream());
-                System.out.println("Connection accepted " + socket.getInetAddress() + ":" + socket.getPort());
-                connect();
+        try (Socket socket = new Socket("localhost", 5000)) {
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            System.out.println("Connection accepted " + socket.getInetAddress() + ":" + socket.getPort());
+            connect();
 
-                while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
-                    System.out.println("Listener: " + message.toString().replace("\n", ""));
-                    user = message.getUser();
-                    msgReceivedChat = message.getChatName();
-                    msg = message.getMsg();
+            while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
+                System.out.println("Listener: " + message.toString().replace("\n", ""));
+                user = message.getUser();
+                msgReceivedChat = message.getChatName();
+                msg = message.getMsg();
 
-                    switch (message.getMessageType()) {
-                        case CONNECTED -> main();
-                        case JOINED_ROOM -> chat();
-                        case RECEIVE -> receive();
-                    }
+                switch (message.getMessageType()) {
+                    case CONNECTED -> main();
+                    case JOINED_ROOM -> chat();
+                    case RECEIVE -> receive();
                 }
             }
         } catch (IOException e) {
@@ -66,10 +64,11 @@ public class Client implements Runnable {
     }
 
     private void receive() {
-        if (chatName.equals(msgReceivedChat)) {
-            user.sendMsg(chatName, msg);
-            viewHandler.getChatController().getTaOutput().appendText(msg);
+        if (!chatName.equals(msgReceivedChat)) {
+            return;
         }
+        user.sendMsg(chatName, msg);
+        viewHandler.getChatController().getTaOutput().appendText(msg);
     }
 
     private void connect() {
@@ -91,14 +90,12 @@ public class Client implements Runnable {
 
     @SneakyThrows
     public void joinRoom(String chat) {
-        chatName = chat;
-        outputStream.writeObject(new Message(chat, MessageType.JOIN_ROOM));
+        outputStream.writeObject(new Message(chatName = chat, MessageType.JOIN_ROOM));
     }
 
     @SneakyThrows
     public void createRoom(String chat) {
-        chatName = chat;
-        outputStream.writeObject(new Message(chat, MessageType.CREATE_ROOM));
+        outputStream.writeObject(new Message(chatName = chat, MessageType.CREATE_ROOM));
     }
 
     @SneakyThrows

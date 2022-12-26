@@ -4,7 +4,7 @@ import com.chat.controller.AbstractController;
 import com.chat.model.Chat;
 import com.chat.model.User;
 import com.chat.server.Client;
-import com.chat.view.impl.ViewHandlerImpl;
+import com.chat.view.ViewHandler;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -37,7 +37,7 @@ public class ChatController extends AbstractController {
     @FXML
     private TextField tfRecipient;
 
-    public ChatController(ViewHandlerImpl viewHandler) {
+    public ChatController(ViewHandler viewHandler) {
         super(viewHandler);
     }
 
@@ -58,8 +58,10 @@ public class ChatController extends AbstractController {
         return e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 String msg = viewHandler.getClient().getUser().getName() + ": " + tfInput.getText() + "\n";
-                viewHandler.getClient().sendMessage(msg);
-                tfInput.clear();
+                if (!tfInput.getText().isEmpty()) {
+                    viewHandler.getClient().sendMessage(msg);
+                    tfInput.clear();
+                }
             }
         };
     }

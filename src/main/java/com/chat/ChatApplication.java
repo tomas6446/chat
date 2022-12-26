@@ -1,6 +1,6 @@
 package com.chat;
 
-import com.chat.view.impl.ViewHandlerImpl;
+import com.chat.view.ViewHandler;
 import javafx.stage.Stage;
 
 /**
@@ -14,6 +14,6 @@ public class ChatApplication extends javafx.application.Application {
 
     @Override
     public void start(Stage primaryStage) {
-        new ViewHandlerImpl(primaryStage).launchLoginWindow();
+        new ViewHandler(primaryStage).launchLoginWindow();
     }
 }

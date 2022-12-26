@@ -10,7 +10,7 @@ import java.util.List;
  * @author Tomas Kozakas
  */
 @Getter
-public class ServerHandler extends Thread {
+public class ServerHandler {
     private final List<ServerThread> serverThreads = new ArrayList<>();
 
     public void addSocket(Socket socket) {

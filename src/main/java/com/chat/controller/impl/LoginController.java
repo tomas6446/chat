@@ -5,7 +5,7 @@ import com.chat.model.Message;
 import com.chat.model.MessageType;
 import com.chat.model.User;
 import com.chat.server.Client;
-import com.chat.view.impl.ViewHandlerImpl;
+import com.chat.view.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -29,7 +29,7 @@ public class LoginController extends AbstractController {
     @FXML
     private Button btnConnect;
 
-    public LoginController(ViewHandlerImpl viewHandler) {
+    public LoginController(ViewHandler viewHandler) {
         super(viewHandler);
     }
 
