@@ -21,6 +21,7 @@ import java.net.Socket;
 public class Client implements Runnable {
     private User user;
     private String chatName;
+    private String msgReceivedChat;
     private String msg;
     private Message message;
 
@@ -46,7 +47,7 @@ public class Client implements Runnable {
                 while (socket.isConnected() && (message = (Message) inputStream.readObject()) != null) {
                     System.out.println("Listener: " + message.toString().replace("\n", ""));
                     user = message.getUser();
-                    chatName = message.getChatName();
+                    msgReceivedChat = message.getChatName();
                     msg = message.getMsg();
 
                     switch (message.getMessageType()) {
@@ -65,7 +66,9 @@ public class Client implements Runnable {
     }
 
     private void receive() {
-        viewHandler.getChatController().getTaOutput().appendText(msg);
+        if(chatName.equals(msgReceivedChat)) {
+            viewHandler.getChatController().getTaOutput().appendText(msg);
+        }
     }
 
     private void connect() {
@@ -87,11 +90,13 @@ public class Client implements Runnable {
 
     @SneakyThrows
     public void joinRoom(String chat) {
+        chatName = chat;
         outputStream.writeObject(new Message(chat, MessageType.JOIN_ROOM));
     }
 
     @SneakyThrows
     public void createRoom(String chat) {
+        chatName = chat;
         outputStream.writeObject(new Message(chat, MessageType.CREATE_ROOM));
     }
 

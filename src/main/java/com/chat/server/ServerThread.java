@@ -64,10 +64,12 @@ public class ServerThread extends Thread {
         for (ServerThread serverThread : serverHandler.getServerThreads()) {
             ObjectOutputStream out = serverThread.getOutputStream();
             User user = serverThread.getLoggedInUser();
-            user.sendMsg(chatName, msg);
-            database.replaceUser(user);
-            database.exportData();
-            out.writeObject(new Message(user, chatName, msg, MessageType.RECEIVE));
+            if(user != null) {
+                user.sendMsg(chatName, msg);
+                database.replaceUser(user);
+                database.exportData();
+                out.writeObject(new Message(user, chatName, msg, MessageType.RECEIVE));
+            }
         }
     }
 
